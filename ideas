@@ -1,0 +1,16 @@
+Collaborative editing algorithm:
+
+1. Wagner & Fischer algorithm for Levenshtein distance: http://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm
+2. Myers algorithm: https://neil.fraser.name/software/diff_match_patch/myers.pdf
+3. http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.13.7179&rep=rep1&type=pdf
+4. http://www.loria.fr/~ignatcla/pmwiki/pub/papers/IgnatICCP08.pdf
+5. Differential sync algorithm: https://neil.fraser.name/writing/sync/
+6. Google Wave operational transformation algorithm: http://www.waveprotocol.org/whitepapers/operational-transform
+
+6. study https://code.google.com/p/google-diff-match-patch/ implementation
+7. study http://www.synchroedit.com/ implemntation
+8. study https://code.google.com/p/google-mobwrite/ implementation
+
+GAE implementation:
+
+1. GAE channel API: https://developers.google.com/appengine/docs/java/channel/
