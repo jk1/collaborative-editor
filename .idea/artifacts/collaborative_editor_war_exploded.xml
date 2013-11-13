@@ -1,0 +1,18 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="collaborative-editor:war exploded">
+    <output-path>$PROJECT_DIR$/target/collaborative-editor-1.0-SNAPSHOT</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="collaborative-editor/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="collaborative-editor" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: com.madgag:util-diff:1.33" />
+          <element id="library" level="project" name="Maven: com.google.guava:guava:r09" />
+          <element id="library" level="project" name="Maven: com.google.appengine:appengine-api-1.0-sdk:1.8.7" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
