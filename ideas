@@ -7,9 +7,12 @@ Collaborative editing algorithm:
 5. Differential sync algorithm: https://neil.fraser.name/writing/sync/
 6. Google Wave operational transformation algorithm: http://www.waveprotocol.org/whitepapers/operational-transform
 
-6. study https://code.google.com/p/google-diff-match-patch/ implementation
-7. study http://www.synchroedit.com/ implemntation
-8. study https://code.google.com/p/google-mobwrite/ implementation
+Implementations:
+
+1. study https://code.google.com/p/google-diff-match-patch/ implementation
+2. study http://www.synchroedit.com/ implemntation
+3. study https://code.google.com/p/google-mobwrite/ implementation
+4. study https://github.com/djspiewak/cccp implementation
 
 GAE implementation:
 
