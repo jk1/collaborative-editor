@@ -20,7 +20,7 @@ public class MainPageController {
     private UserService userService = UserServiceFactory.getUserService();
 
     @RequestMapping(value = {"/index", "/"}, method = RequestMethod.GET)
-    public ModelAndView getDocument(HttpServletRequest request) {
+    public ModelAndView getEditorPage(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("editor");
         mav.addObject("logoutUrl", userService.createLogoutURL(request.getRequestURI()));
         return mav;

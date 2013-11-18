@@ -43,6 +43,10 @@ public class Document {
         return text;
     }
 
+    public void setText(String text) {
+        this.text = text;
+    }
+
     public static class Header {
         private final Integer id;
         private final String name;

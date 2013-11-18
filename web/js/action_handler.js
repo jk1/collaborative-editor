@@ -2,14 +2,12 @@
  * Initialize server connection & event handlers on document load
  */
 $(document).ready(function () {
-    mobwrite.syncGateway = '${pageContext.request.contextPath}/document';
-    mobwrite.share('demo_editor_title', 'demo_editor_text');
     //initially no document is chosen
     $('#documentPanel').hide();
     //load all known document names from server
     transport.getDocumentHeaders(function (headers) {
         $.each(headers, function (index, header) {
-            addDocumentToThePage(header.id, header.name);
+            addDocumentToPage(header.id, header.name);
         });
     });
     //bind event handlers
@@ -21,13 +19,20 @@ $(document).ready(function () {
  */
 function documentListOnClick(e) {
     e.preventDefault();
-    transport.loadDocument(e.target.id, function (document) {
-        $('#title').text(document.title);
-        $('#demo_editor_text').text(document.text);
-        $('#documentPanel').show();
-    });
+    //change list highlighting
     $('.active').removeClass('active');
     $(e.target).addClass('active');
+    //stop remote document sharing
+    mobwrite.unshare('documentArea');
+    //switch to a new document
+    transport.loadDocument(e.target.id, function (document) {
+        $('#title').text(document.title);
+        $('#documentArea').text(document.text);
+        $('#documentPanel').show();
+        //start remote document sharing
+        mobwrite.syncGateway = '/document/' + e.target.id;
+        mobwrite.share('documentArea');
+    });
 }
 
 /**
@@ -36,13 +41,12 @@ function documentListOnClick(e) {
 function createDocumentOnClick(e) {
     input = $('#nameInput');
     transport.createDocument(input.val(), function(header){
-        addDocumentToThePage(header.id, header.name);
+        addDocumentToPage(header.id, header.name);
     });
-
     input.val('');
 }
 
-function addDocumentToThePage(id, name) {
+function addDocumentToPage(id, name) {
     $('.list-group').append($('<a class="list-group-item" id="' + id + '" href="#"><span class="glyphicon glyphicon-chevron-right"></span> &nbsp;' + name + '</a>'));
     $('.list-group-item').on('click', documentListOnClick);
 }
