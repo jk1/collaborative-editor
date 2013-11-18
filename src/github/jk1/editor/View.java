@@ -12,15 +12,17 @@ public class View {
     private Document document;
     private String shadow;
     private String backupShadow;
-    private int shadowClientVersion;
-    private int shadowServerVersion;
-    private int backUpShadowServerVersion;
+    private int shadowClientVersion = 0;
+    private int shadowServerVersion = 0;
+    private int backUpShadowServerVersion = 0;
     private boolean deltaOk;
     private LinkedList<EditStackElement> editStack = new LinkedList<>();
 
     public View(String userName, Document document) {
         this.userName = userName;
         this.document = document;
+        this.shadow = document.getText();
+        this.shadow = document.getTitle();
     }
 
     public void rollback() {
@@ -40,6 +42,10 @@ public class View {
 
     public void incrementShadowServerVersion() {
         shadowServerVersion++;
+    }
+
+    public void incrementShadowClientVersion() {
+        shadowClientVersion++;
     }
 
     public String getUserName() {
@@ -102,7 +108,7 @@ public class View {
         return editStack;
     }
 
-    public class EditStackElement{
+    public static class EditStackElement {
         public final int version;
         public final String edit;
 

@@ -41,7 +41,7 @@
                         <span class="glyphicon glyphicon-pencil"></span> &nbsp;<span id="title"></span>
                     </div>
                     <div class="panel-body">
-                        <textarea id="documentArea" style="width:100%;height:100%;"></textarea>
+                        <textarea class="document-area" style="width:100%;height:100%;"></textarea>
                     </div>
                 </div>
             </div>

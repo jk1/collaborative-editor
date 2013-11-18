@@ -2,6 +2,7 @@
  * Initialize server connection & event handlers on document load
  */
 $(document).ready(function () {
+    mobwrite.debug = true;
     //initially no document is chosen
     $('#documentPanel').hide();
     //load all known document names from server
@@ -22,17 +23,17 @@ function documentListOnClick(e) {
     //change list highlighting
     $('.active').removeClass('active');
     $(e.target).addClass('active');
+    $('#documentPanel').show();
+    textArea = $('.document-area');
     //stop remote document sharing
-    mobwrite.unshare('documentArea');
+    mobwrite.unshare(textArea.attr('id'));
     //switch to a new document
-    transport.loadDocument(e.target.id, function (document) {
-        $('#title').text(document.title);
-        $('#documentArea').text(document.text);
-        $('#documentPanel').show();
-        //start remote document sharing
-        mobwrite.syncGateway = '/document/' + e.target.id;
-        mobwrite.share('documentArea');
-    });
+    $('#title').text(e.target.innerText);
+    textArea.val('');
+    newId = 'document_' + e.target.id;
+    textArea.attr('id', newId);
+    mobwrite.syncGateway = '/document/' + e.target.id;
+    mobwrite.share(newId);
 }
 
 /**

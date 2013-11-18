@@ -7,18 +7,27 @@ public class Message {
 
     public static enum Mode{DELTA, RAW}
 
-    private int id;
+    private String documentName;
+    private String userName;
     private Mode mode;
     private String payload;
     private int serverVersion;
     private int clientVersion;
 
-    public int getId() {
-        return id;
+    public String getDocumentName() {
+        return documentName;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setDocumentName(String documentName) {
+        this.documentName = documentName;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public Mode getMode() {
@@ -51,5 +60,11 @@ public class Message {
 
     public void setClientVersion(int clientVersion) {
         this.clientVersion = clientVersion;
+    }
+
+    @Override
+    public String toString() {
+        String template = "[Username: %s, Document: %s ,Mode: %s, client: %d, server: %d, payload: %s]";
+        return String.format(template, userName, documentName, mode, clientVersion, serverVersion, payload);
     }
 }

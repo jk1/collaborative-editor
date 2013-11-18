@@ -19,7 +19,7 @@ public class DocumentService {
     public DocumentService() {
         String name = "Sample document";
         Document.Header header = new Document.Header(idGenerator.incrementAndGet(), name);
-        documents.put(header, new Document(header, "Default text"));
+        documents.put(header, new Document(header));
     }
 
     public Document getDocument(Integer id) {
