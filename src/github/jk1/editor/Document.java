@@ -1,24 +1,33 @@
 package github.jk1.editor;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *
+ * <p/>
+ * Document instances are thread-safe.
  *
  * @author Evgeny Naumenko
  */
 public class Document {
 
-    private Map<String, View> views = new ConcurrentHashMap<>();
+    //todo: destroy stale views (session listener?)
+    private Map<String, View> views = new HashMap<>();
 
-    private Header header;
-    private String text  = "";
+    private final Header header;
+    private volatile String text = "";
 
     public Document(Header header) {
         this.header = header;
     }
 
+    /**
+     * Returns a View object for the given unique editor instance name.
+     * If no view can be found, a new one is created.
+     *
+     * @param editorName
+     * @return
+     */
     public synchronized View getView(String editorName) {
         View view = views.get(editorName);
         if (view == null) {
@@ -26,6 +35,10 @@ public class Document {
             views.put(editorName, view);
         }
         return view;
+    }
+
+    public int getId() {
+        return header.getId();
     }
 
     public String getTitle() {
@@ -42,7 +55,7 @@ public class Document {
 
     /**
      * Document header is used for document identification. Header
-     * does not contain the full document text, so it's cheap to
+     * does not contain the full document text, so it's ok to
      * send headers list over the wire without any pagination involved
      */
     public static class Header {
