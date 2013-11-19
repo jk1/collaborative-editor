@@ -4,23 +4,36 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
+ * Represents a document view for a particular client editor instance.
+ * A single user may open several editors in scope of the one web session,
+ * and all his editors are treated independently, as though the have been
+ * created by different users.
  *
+ * View uses a "shadow" as a representation of what server thinks client text is.
+ * "Backup shadow" is effectively a "shadow" one version back, to roll the shadow back
+ * in case of a temporary network failure.
+ *
+ * @author Evgeny Naumenko
  */
 public class View {
 
-    private String userName;
     private Document document;
+    private String editorInstanceName;
     private String shadow;
     private String backupShadow;
     private int shadowClientVersion = 0;
     private int shadowServerVersion = 0;
     private int backUpShadowServerVersion = 0;
     private boolean deltaOk;
-    private LinkedList<EditStackElement> editStack = new LinkedList<>();
 
-    public View(String userName, Document document) {
-        this.userName = userName;
+    /**
+     *
+     */
+    private LinkedList<Diff> editStack = new LinkedList<>();
+
+    public View(Document document, String editorInstanceName) {
         this.document = document;
+        this.editorInstanceName = editorInstanceName;
         this.shadow = document.getText();
         this.shadow = document.getTitle();
     }
@@ -32,9 +45,9 @@ public class View {
     }
 
     public void dropObsoleteEditStackRecords(int currentVersion) {
-        Iterator<EditStackElement> iterator = editStack.iterator();
+        Iterator<Diff> iterator = editStack.iterator();
         while (iterator.hasNext()) {
-            if (iterator.next().version < currentVersion) {
+            if (iterator.next().getVersion() < currentVersion) {
                 iterator.remove();
             }
         }
@@ -46,10 +59,6 @@ public class View {
 
     public void incrementShadowClientVersion() {
         shadowClientVersion++;
-    }
-
-    public String getUserName() {
-        return userName;
     }
 
     public Document getDocument() {
@@ -66,6 +75,10 @@ public class View {
 
     public String getBackupShadow() {
         return backupShadow;
+    }
+
+    public String getEditorInstanceName() {
+        return editorInstanceName;
     }
 
     public void setBackupShadow(String backupShadow) {
@@ -104,17 +117,7 @@ public class View {
         this.deltaOk = deltaOk;
     }
 
-    public LinkedList<EditStackElement> getEditStack() {
+    public LinkedList<Diff> getEditStack() {
         return editStack;
-    }
-
-    public static class EditStackElement {
-        public final int version;
-        public final String edit;
-
-        public EditStackElement(int version, String edit) {
-            this.version = version;
-            this.edit = edit;
-        }
     }
 }

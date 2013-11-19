@@ -55,11 +55,13 @@
     </div>
 </div>
 <!--speed up page load a bit-->
+<script>
+   var channelToken = "${token}";
+</script>
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/_ah/channel/jsapi"></script>
-<script type="text/javascript"
-        src="${pageContext.request.contextPath}/js/diff_match_patch_uncompressed.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/diff_match_patch_uncompressed.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/mobwrite_core.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/mobwrite_form.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/transport.js"></script>

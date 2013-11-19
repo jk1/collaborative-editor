@@ -5,26 +5,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- *
- *
  * @author Evgeny Naumenko
  * @see <a href="https://code.google.com/p/google-mobwrite/wiki/Protocol">MobWrite protocol reference</a>
  */
 public class MobWriteMessage {
 
-    public static enum Mode {DELTA, RAW}
 
     private String documentName;
-    private String editorId;
-    private Mode mode;
-    private String payload;
+    private String editorName;
     private int serverVersion;
-    private int clientVersion;
+    private List<Diff> diffs = new ArrayList<>();
 
     public MobWriteMessage(InputStream stream) throws IOException {
-        //todo: support several d: lines
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
         String line;
         while ((line = bufferedReader.readLine()) != null) {
@@ -34,7 +30,7 @@ public class MobWriteMessage {
                     char name = command.substring(0, 1).toLowerCase().charAt(0);
                     String value = command.substring(2);
                     if ('u' == name) {
-                        editorId = value;
+                        editorName = value;
                     } else {
                         int div = value.indexOf(':');
                         if (div == -1) {
@@ -44,14 +40,10 @@ public class MobWriteMessage {
                         if ('f' == name) {
                             serverVersion = Integer.parseInt(value.substring(0, div));
                             documentName = value.substring(div + 1);
-                        } else if ('r' == name) {
-                            mode = MobWriteMessage.Mode.RAW;
-                            clientVersion = Integer.parseInt(value.substring(0, div));
-                            payload = value.substring(div + 1); // strip colon
-                        } else if ('d' == name) {
-                            mode = MobWriteMessage.Mode.DELTA;
-                            clientVersion = Integer.parseInt(value.substring(0, div));
-                            payload = value.substring(div + 1); // strip colon
+                        } else {
+                            int clientVersion = Integer.parseInt(value.substring(0, div));
+                            String payload = payload = value.substring(div + 1); // strip colon
+                            diffs.add(new Diff(name, clientVersion, payload));
                         }
                     }
                 }
@@ -63,29 +55,21 @@ public class MobWriteMessage {
         return documentName;
     }
 
-    public String getEditorId() {
-        return editorId;
-    }
-
-    public Mode getMode() {
-        return mode;
-    }
-
-    public String getPayload() {
-        return payload;
+    public String getEditorName() {
+        return editorName;
     }
 
     public int getServerVersion() {
         return serverVersion;
     }
 
-    public int getClientVersion() {
-        return clientVersion;
+    public List<Diff> getDiffs() {
+        return diffs;
     }
 
     @Override
     public String toString() {
-        String template = "[Username: %s, Document: %s ,Mode: %s, client: %d, server: %d, payload: %s]";
-        return String.format(template, editorId, documentName, mode, clientVersion, serverVersion, payload);
+        String template = "[Document: %s, server: %d, diffs: %s, editor name: %s]";
+        return String.format(template, documentName, serverVersion, diffs, editorName);
     }
 }

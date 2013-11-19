@@ -48,7 +48,7 @@ public class DocumentController {
     public String postChanges(@PathVariable Integer id, InputStream stream) throws IOException {
         Document document = documentDao.getDocument(id);
         MobWriteMessage mobWriteMessage = new MobWriteMessage(stream);
-        View view = document.getView(mobWriteMessage.getEditorId());
+        View view = document.getView(mobWriteMessage.getEditorName());
         documentService.process(view, mobWriteMessage);
         return documentService.generateDiffs(view, mobWriteMessage);
     }

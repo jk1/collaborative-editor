@@ -1,38 +1,31 @@
 package github.jk1.editor;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
+ *
+ * @author Evgeny Naumenko
  */
 public class Document {
 
-    private transient Map<String, View> views = new HashMap<>();
+    private Map<String, View> views = new ConcurrentHashMap<>();
 
     private Header header;
-    private String text;
+    private String text  = "";
 
     public Document(Header header) {
-        this(header, "");
-    }
-
-    public Document(Header header, String text) {
         this.header = header;
-        this.text = text;
     }
 
-    public synchronized View getView(String userName) {
-        View view = views.get(userName);
+    public synchronized View getView(String editorName) {
+        View view = views.get(editorName);
         if (view == null) {
-            view = new View(userName, this);
-            views.put(userName, view);
+            view = new View(this, editorName);
+            views.put(editorName, view);
         }
         return view;
-    }
-
-    public int getId() {
-        return header.getId();
     }
 
     public String getTitle() {
@@ -47,6 +40,11 @@ public class Document {
         this.text = text;
     }
 
+    /**
+     * Document header is used for document identification. Header
+     * does not contain the full document text, so it's cheap to
+     * send headers list over the wire without any pagination involved
+     */
     public static class Header {
         private final Integer id;
         private final String name;
