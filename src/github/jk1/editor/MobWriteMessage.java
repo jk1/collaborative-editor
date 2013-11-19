@@ -24,7 +24,7 @@ public class MobWriteMessage {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
         String line;
         while ((line = bufferedReader.readLine()) != null) {
-            line = URLDecoder.decode(line, "UTF-8").substring(2); // strip "q="
+            line = URLDecoder.decode(line, "UTF-8");
             for (String command : line.split("\n")) {
                 if (!command.isEmpty()) {
                     char name = command.substring(0, 1).toLowerCase().charAt(0);
@@ -42,7 +42,7 @@ public class MobWriteMessage {
                             documentName = value.substring(div + 1);
                         } else {
                             int clientVersion = Integer.parseInt(value.substring(0, div));
-                            String payload = payload = value.substring(div + 1); // strip colon
+                            String payload = value.substring(div + 1); // strip colon
                             diffs.add(new Diff(name, clientVersion, payload));
                         }
                     }

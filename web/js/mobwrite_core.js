@@ -479,7 +479,7 @@ mobwrite.syncRun1_ = function() {
     // Execution will resume in mobwrite.callback();
   } else {
     // Issue Ajax post of client-side changes and request server-side changes.
-    data = 'q=' + encodeURIComponent(data);
+    data = encodeURIComponent(data);
     mobwrite.syncAjaxObj_ = mobwrite.syncLoadAjax_(mobwrite.syncGateway, data,
         mobwrite.syncCheckAjax_);
     // Execution will resume in either syncCheckAjax_(), or syncKill_()
