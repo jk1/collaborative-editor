@@ -1,5 +1,6 @@
-.documentArea {
-    min-height: 400px;
+.document-area {
+    min-height: 500px;
+    width: 100%;
 }
 
 html, body {
