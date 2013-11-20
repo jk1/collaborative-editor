@@ -401,7 +401,6 @@ mobwrite.shareObj.prototype.syncText = function() {
 
 /**
  * Collect all client-side changes and send them to the server.
- * @private
  */
 mobwrite.syncRun1_ = function() {
   // Initialize clientChange_, to be checked at the end of syncRun2_.
@@ -434,6 +433,17 @@ mobwrite.syncRun1_ = function() {
     }
     mobwrite.syncRun2_('\n\n');
     return;
+  }
+  if (data[1].match(/\=\d*\n$/)) { //tries to filter no-diff sync calls
+      if (mobwrite.force) {
+          mobwrite.force = false;  // force flag works only once
+      } else {
+          if (mobwrite.debug) {
+              window.console.info('Nothing to publish, skipping server sync');
+          }
+          mobwrite.syncRun2_('\n\n');
+          return;
+      }
   }
 
   var remote = (mobwrite.syncGateway.indexOf('://') != -1);

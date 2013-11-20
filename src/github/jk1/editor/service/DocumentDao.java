@@ -7,12 +7,15 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 /**
  *
  */
 @Repository
 public class DocumentDao {
+
+    private static final Logger LOGGER = Logger.getLogger(DocumentDao.class.getName());
 
     private Map<Document.Header, Document> documents = new ConcurrentHashMap<>();
     private AtomicInteger idGenerator = new AtomicInteger(0);
@@ -35,6 +38,7 @@ public class DocumentDao {
         //name doesn't need to be unique, so no synchronization is necessary
         Document.Header header = new Document.Header(idGenerator.incrementAndGet(), name);
         documents.put(header, new Document(header));
+        LOGGER.info("New document created: " + header);
         return header;
     }
 }

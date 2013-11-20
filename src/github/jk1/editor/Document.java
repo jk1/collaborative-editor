@@ -1,5 +1,7 @@
 package github.jk1.editor;
 
+import org.codehaus.jackson.map.ObjectMapper;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,6 +91,11 @@ public class Document {
         @Override
         public int hashCode() {
             return id.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return "[id=" + id + ", name=" + name + "]";
         }
     }
 }

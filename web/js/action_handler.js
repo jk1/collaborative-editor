@@ -1,26 +1,33 @@
+var action_handler = {};
+
 /*
  * Initialize server connection & event handlers on document load
  */
 $(document).ready(function () {
+    transport.openChannel(channelToken);
     mobwrite.debug = true;
     mobwrite.syncUsername = channelToken;
     mobwrite.maxSyncInterval = 1000;
     //initially no document is chosen
     $('#documentPanel').hide();
     //load all known document names from server
+    action_handler.refreshDocumentList();
+    //bind event handlers
+    $('#createDocument').on('click', createDocumentOnClick);
+});
+
+action_handler.refreshDocumentList = function(){
     transport.getDocumentHeaders(function (headers) {
         $.each(headers, function (index, header) {
             addDocumentToPage(header.id, header.name);
         });
     });
-    //bind event handlers
-    $('#createDocument').on('click', createDocumentOnClick);
-});
+};
 
 /**
  * Handle document selection. When user selects document in a list
  * the document is opened and remote sharing session begins. Only one
- * sharing session may be in progress at any given moment, so
+ * sharing session may be in progress at any given moment
  */
 function documentListOnClick(e) {
     e.preventDefault();
@@ -53,6 +60,8 @@ function createDocumentOnClick(e) {
 }
 
 function addDocumentToPage(id, name) {
-    $('.list-group').append($('<a class="list-group-item" id="' + id + '" href="#"><span class="glyphicon glyphicon-chevron-right"></span> &nbsp;' + name + '</a>'));
-    $('.list-group-item').on('click', documentListOnClick);
+    if ($('#' + id).length == 0){
+        $('.list-group').append($('<a class="list-group-item" id="' + id + '" href="#"><span class="glyphicon glyphicon-chevron-right"></span> &nbsp;' + name + '</a>'));
+        $('.list-group-item').on('click', documentListOnClick);
+    }
 }
