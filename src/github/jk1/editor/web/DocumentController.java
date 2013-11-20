@@ -1,15 +1,11 @@
 package github.jk1.editor.web;
 
-import com.google.appengine.api.channel.ChannelService;
-import com.google.appengine.api.channel.ChannelServiceFactory;
 import github.jk1.editor.Document;
 import github.jk1.editor.MobWriteMessage;
 import github.jk1.editor.View;
 import github.jk1.editor.service.CommunicationService;
 import github.jk1.editor.service.DocumentDao;
 import github.jk1.editor.service.DocumentService;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
