@@ -1,5 +1,7 @@
 package github.jk1.editor.web;
 
+import com.google.appengine.api.channel.ChannelService;
+import com.google.appengine.api.channel.ChannelServiceFactory;
 import github.jk1.editor.Document;
 import github.jk1.editor.MobWriteMessage;
 import github.jk1.editor.View;
@@ -23,7 +25,7 @@ public class DocumentController {
 
     private DocumentDao documentDao;
     private DocumentService documentService;
-
+    private ChannelService channelService = ChannelServiceFactory.getChannelService();
 
     @Autowired
     public DocumentController(DocumentDao documentDao, DocumentService documentService) {

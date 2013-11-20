@@ -32,6 +32,7 @@ public class DocumentDao {
     }
 
     public Document.Header createDocument(String name){
+        //name doesn't need to be unique, so no synchronization is necessary
         Document.Header header = new Document.Header(idGenerator.incrementAndGet(), name);
         documents.put(header, new Document(header));
         return header;
