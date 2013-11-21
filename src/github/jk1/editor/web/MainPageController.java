@@ -2,7 +2,7 @@ package github.jk1.editor.web;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
-import github.jk1.editor.service.CommunicationService;
+import github.jk1.editor.service.ClientNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,16 +20,16 @@ import javax.servlet.http.HttpServletRequest;
 public class MainPageController {
 
     private UserService userService = UserServiceFactory.getUserService();
-    private CommunicationService communicationService;
+    private ClientNotificationService clientNotificationService;
 
     @Autowired
-    public MainPageController(CommunicationService communicationService) {
-        this.communicationService = communicationService;
+    public MainPageController(ClientNotificationService clientNotificationService) {
+        this.clientNotificationService = clientNotificationService;
     }
 
     @RequestMapping(value = {"/index", "/"}, method = RequestMethod.GET)
     public ModelAndView getEditorPage(HttpServletRequest request) {
-        String token = communicationService.createAndRegisterToken();
+        String token = clientNotificationService.createAndRegisterToken();
         ModelAndView mav = new ModelAndView("editor");
         mav.addObject("logoutUrl", userService.createLogoutURL(request.getRequestURI()));
         mav.addObject("token", token);

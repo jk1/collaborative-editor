@@ -1,4 +1,4 @@
-package github.jk1.editor;
+package github.jk1.editor.model;
 
 /**
  * An atomic update operation, issued by the client or the server

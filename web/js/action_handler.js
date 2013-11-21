@@ -7,7 +7,9 @@ $(document).ready(function () {
     transport.openChannel(channelToken);
     mobwrite.debug = true;
     mobwrite.syncUsername = channelToken;
-    mobwrite.maxSyncInterval = 1000;
+    //adaptive diff check, the more active a user is, the less time we wait between diff checks
+    mobwrite.maxSyncInterval = 200;
+    mobwrite.minSyncInterval = 1000;
     //initially no document is chosen
     $('#documentPanel').hide();
     //load all known document names from server

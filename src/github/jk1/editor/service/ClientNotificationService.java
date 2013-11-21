@@ -19,9 +19,9 @@ import java.util.logging.Logger;
  * @see <a href="https://developers.google.com/appengine/docs/java/channel/">GAE Channel API</a>
  */
 @Service
-public class CommunicationService {
+public class ClientNotificationService {
 
-    private static final Logger LOGGER = Logger.getLogger(CommunicationService.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ClientNotificationService.class.getName());
 
     private ChannelService channelService = ChannelServiceFactory.getChannelService();
     private Set<String> channelTokens = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
@@ -55,7 +55,6 @@ public class CommunicationService {
 
 
     public static interface BroadcastFilter {
-
         public boolean broadcastToChannel(String channelToken);
     }
 
