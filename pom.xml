@@ -11,7 +11,7 @@
 
     <properties>
         <appengine.version>1.8.7</appengine.version>
-        <springVersion>3.1.0.RELEASE</springVersion>
+        <springVersion>3.2.5.RELEASE</springVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -98,6 +98,7 @@
 
     <build>
         <sourceDirectory>src</sourceDirectory>
+        <testSourceDirectory>test</testSourceDirectory>
         <plugins>
            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

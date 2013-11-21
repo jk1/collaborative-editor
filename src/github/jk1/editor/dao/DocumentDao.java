@@ -36,15 +36,28 @@ public class DocumentDao {
         documents.put(header, new Document(diffMatchPatch, header));
     }
 
+    /**
+     *
+     * @param id unique document identifier
+     * @throws NotFoundException if no document matches id given
+     * @return document matching id given
+     */
     public Document getDocument(Integer id) {
-        return documents.get(new DocumentHeader(id));
+        Document document = documents.get(new DocumentHeader(id));
+        if (document == null) {
+            String message = "Unable to find requested document with id " + id;
+            LOGGER.warning(message);
+            throw new NotFoundException(message);
+        } else {
+            return document;
+        }
     }
 
     public Collection<DocumentHeader> getAllDocumentHeaders() {
         return documents.keySet();
     }
 
-    public DocumentHeader createDocument(String name){
+    public DocumentHeader createDocument(String name) {
         //name doesn't need to be unique, so no synchronization is necessary
         DocumentHeader header = new DocumentHeader(idGenerator.incrementAndGet(), name);
         documents.put(header, new Document(diffMatchPatch, header));

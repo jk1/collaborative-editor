@@ -48,7 +48,14 @@ public class View {
         this.shadow = document.getTitle();
     }
 
-    public synchronized MobWriteMessage process(MobWriteMessage clientMessage) {
+    /**
+     * Applies client diff message to the current view and generates response
+     * diff for the client.
+     *
+     * @param clientMessage
+     * @return
+     */
+    public synchronized MobWriteMessage apply(MobWriteMessage clientMessage) {
         LOGGER.info(clientMessage.toString());
         if (clientMessage.getVersion() != shadowServerVersion
                 && clientMessage.getVersion() == backUpShadowServerVersion) {
@@ -57,11 +64,7 @@ public class View {
         }
         this.dropObsoleteEditStackRecords(clientMessage.getVersion());
         for (Diff diff : clientMessage.getDiffs()) {
-            if (diff.getMode() == Diff.Mode.DELTA) {
-                this.processDelta(clientMessage, diff);
-            } else {
-                this.processRaw(clientMessage, diff);
-            }
+            diff.getMode().applyToView(this, clientMessage, diff);
         }
         return this.generateResponse(clientMessage);
     }
@@ -82,7 +85,7 @@ public class View {
         }
     }
 
-    private void processRaw(MobWriteMessage clientMessage, Diff diff) {
+    void processRaw(MobWriteMessage clientMessage, Diff diff) {
         shadow = diff.getPayload();
         shadowClientVersion = diff.getVersion();
         shadowServerVersion = clientMessage.getVersion();
@@ -91,7 +94,7 @@ public class View {
         editStack.clear();
     }
 
-    private void processDelta(MobWriteMessage clientMessage, Diff diff) {
+    void processDelta(MobWriteMessage clientMessage, Diff diff) {
         if (this.assertDelta(clientMessage, diff)) {
             LinkedList<diff_match_patch.Diff> diffs = diffMatchPatch.diff_fromDelta(shadow, diff.getPayload());
             shadowClientVersion++;
@@ -142,10 +145,10 @@ public class View {
         if (deltaOk) {
             LinkedList<diff_match_patch.Diff> diffs = diffMatchPatch.diff_main(shadow, masterText);
             String diffString = diffMatchPatch.diff_toDelta(diffs);
-            diff = new Diff(Diff.Mode.DELTA, shadowServerVersion, diffString);
+            diff = new Diff(DiffMode.DELTA, shadowServerVersion, diffString);
         } else {
             // server could not parse client's delta, sent raw response back
-            diff = new Diff(Diff.Mode.RAW, shadowServerVersion, masterText);
+            diff = new Diff(DiffMode.RAW, shadowServerVersion, masterText);
         }
         editStack.add(diff);
         shadowServerVersion++;

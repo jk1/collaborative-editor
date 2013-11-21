@@ -26,7 +26,7 @@ public class ClientNotificationService {
     private ChannelService channelService = ChannelServiceFactory.getChannelService();
     private Set<String> channelTokens = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
-    public enum MessageKey{UPDATE_LIST, UPDATE_DOCUMENT}
+    public enum MessageKey {UPDATE_LIST, UPDATE_DOCUMENT}
 
     /**
      * Sends a message to all connected clients
@@ -53,9 +53,8 @@ public class ClientNotificationService {
         return token;
     }
 
-
     public static interface BroadcastFilter {
-        public boolean broadcastToChannel(String channelToken);
+        boolean broadcastToChannel(String channelToken);
     }
 
     public static final BroadcastFilter BROADCAST_TO_ALL = new BroadcastFilter() {

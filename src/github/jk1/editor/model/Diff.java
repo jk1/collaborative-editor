@@ -7,17 +7,15 @@ package github.jk1.editor.model;
  */
 public class Diff {
 
-    public static enum Mode {DELTA, RAW}
-
     private int version;
-    private Mode mode;
+    private DiffMode mode;
     private String payload;
 
     public Diff(char mode, int version, String payload) {
-        this('d' == mode ? Mode.DELTA : Mode.RAW, version, payload);
+        this('d' == mode ? DiffMode.DELTA : DiffMode.RAW, version, payload);
     }
 
-    public Diff(Mode mode, int version, String payload) {
+    public Diff(DiffMode mode, int version, String payload) {
         this.version = version;
         this.mode = mode;
         this.payload = payload;
@@ -27,7 +25,7 @@ public class Diff {
         return version;
     }
 
-    public Mode getMode() {
+    public DiffMode getMode() {
         return mode;
     }
 
@@ -37,7 +35,7 @@ public class Diff {
 
     @Override
     public String toString() {
-        String template = mode == Mode.DELTA ? "d:%d:%s\n" : "R:%d:%s\n";
+        String template = mode == DiffMode.DELTA ? "d:%d:%s\n" : "R:%d:%s\n";
         return String.format(template, version, payload);
     }
 }

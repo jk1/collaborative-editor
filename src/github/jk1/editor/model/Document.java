@@ -47,7 +47,7 @@ public class Document {
     }
 
     public String getTitle() {
-        return header.getName();
+        return header.getTitle();
     }
 
     public String getText() {

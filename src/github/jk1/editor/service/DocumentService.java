@@ -30,8 +30,10 @@ public class DocumentService {
     }
 
     /**
+     * Creates a new document with a given name and sends notifications
+     * to all available user, that a document has been added.
      *
-     * @param name
+     * @param name non-unique, non-null name for a new  document
      */
     public void createDocument(String name) {
         dao.createDocument(name);
@@ -46,15 +48,15 @@ public class DocumentService {
      */
     public MobWriteMessage applyClientMessage(Document document, final MobWriteMessage message) {
         View view = document.getView(message.getEditorName());
-        MobWriteMessage response = view.process(message);
-        clientNotificationService.broadcast(UPDATE_DOCUMENT, new ClientNotificationService.BroadcastFilter() { // todo: separate thread for speedup?
+        MobWriteMessage response = view.apply(message);
+        clientNotificationService.broadcast(UPDATE_DOCUMENT, new ClientNotificationService.BroadcastFilter() {
             @Override
             public boolean broadcastToChannel(String channelToken) {
                 //to all but the diff author
+                //todo: send updates to the users, who are actually sharing the document
                 return !channelToken.equals(message.getEditorName());
             }
         });
         return response;
     }
-
 }
