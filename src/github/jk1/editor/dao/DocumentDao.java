@@ -2,8 +2,8 @@ package github.jk1.editor.dao;
 
 import github.jk1.editor.model.Document;
 import github.jk1.editor.model.DocumentHeader;
-import name.fraser.neil.plaintext.StandardBreakScorer;
 import name.fraser.neil.plaintext.diff_match_patch;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -24,17 +24,11 @@ public class DocumentDao {
 
     private static final Logger LOGGER = Logger.getLogger(DocumentDao.class.getName());
 
-    private diff_match_patch diffMatchPatch = new diff_match_patch(new StandardBreakScorer());
+    @Autowired
+    private diff_match_patch diffMatchPatch;
 
     private Map<DocumentHeader, Document> documents = new ConcurrentHashMap<>();
     private AtomicInteger idGenerator = new AtomicInteger(0);
-
-    public DocumentDao() {
-        //init storage with one default document for demo purposes
-        String name = "Sample document";
-        DocumentHeader header = new DocumentHeader(idGenerator.incrementAndGet(), name);
-        documents.put(header, new Document(diffMatchPatch, header));
-    }
 
     /**
      *

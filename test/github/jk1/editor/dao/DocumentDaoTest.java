@@ -22,13 +22,6 @@ public class DocumentDaoTest {
     }
 
     @Test
-    public void testGetDocument() {
-        Document document = dao.getDocument(1);
-
-        assertEquals("Sample document", document.getTitle());
-    }
-
-    @Test
     public void testCreateDocument() {
         DocumentHeader header = dao.createDocument("name");
 

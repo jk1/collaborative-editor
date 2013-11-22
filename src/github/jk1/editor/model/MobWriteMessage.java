@@ -19,16 +19,16 @@ import java.util.List;
 public class MobWriteMessage {
 
     private String documentName;
-    private String editorName;
+    private String token;
     private int version;
     private List<Diff> diffs = new ArrayList<>();
 
     private MobWriteMessage() {
     }
 
-    public MobWriteMessage(String documentName, String editorName, int version) {
+    public MobWriteMessage(String documentName, String token, int version) {
         this.documentName = documentName;
-        this.editorName = editorName;
+        this.token = token;
         this.version = version;
     }
 
@@ -52,7 +52,7 @@ public class MobWriteMessage {
         char name = command.substring(0, 1).toLowerCase().charAt(0);
         String value = command.substring(2);
         if ('u' == name) {
-            message.editorName = value;
+            message.token = value;
         } else {
             int div = value.indexOf(':');
             if (div == -1) {
@@ -86,8 +86,8 @@ public class MobWriteMessage {
         return documentName;
     }
 
-    public String getEditorName() {
-        return editorName;
+    public String getToken() {
+        return token;
     }
 
     public int getVersion() {
@@ -105,6 +105,6 @@ public class MobWriteMessage {
     @Override
     public String toString() {
         String template = "[Document: %s, server: %d, diffs: %s, editor name: %s]";
-        return String.format(template, documentName, version, diffs, editorName);
+        return String.format(template, documentName, version, diffs, token);
     }
 }

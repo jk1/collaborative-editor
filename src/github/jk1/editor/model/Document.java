@@ -2,8 +2,10 @@ package github.jk1.editor.model;
 
 import name.fraser.neil.plaintext.diff_match_patch;
 
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p/>
@@ -13,10 +15,9 @@ import java.util.Map;
  */
 public class Document {
 
-    private diff_match_patch diffMatchPatch;
+    private final diff_match_patch diffMatchPatch;
 
-    //todo: destroy stale views (session listener?)
-    private Map<String, View> views = new HashMap<>();
+    private Map<String, View> views = new ConcurrentHashMap<>();
 
     private final DocumentHeader header;
     private volatile String text = "";
@@ -30,16 +31,24 @@ public class Document {
      * Returns a View object for the given unique editor instance name.
      * If no view can be found, a new one is created.
      *
-     * @param editorName
+     * @param token
      * @return
      */
-    public synchronized View getView(String editorName) {
-        View view = views.get(editorName);
+    public synchronized View getView(String token) {
+        View view = views.get(token);
         if (view == null) {
-            view = new View(diffMatchPatch, this, editorName);
-            views.put(editorName, view);
+            view = new View(diffMatchPatch, this, token);
+            views.put(token, view);
         }
         return view;
+    }
+
+    public Collection<String> getSubscribers(){
+       return new HashSet<>(views.keySet()); // defensive copy
+    }
+
+    public void deleteView(String token){
+        views.remove(token);
     }
 
     public int getId() {

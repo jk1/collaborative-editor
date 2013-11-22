@@ -21,7 +21,7 @@ $(document).ready(function () {
 action_handler.refreshDocumentList = function(){
     transport.getDocumentHeaders(function (headers) {
         $.each(headers, function (index, header) {
-            addDocumentToPage(header.id, header.name);
+            addDocumentToPage(header.id, header.title);
         });
     });
 };

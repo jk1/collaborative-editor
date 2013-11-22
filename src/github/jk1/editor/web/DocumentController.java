@@ -21,15 +21,10 @@ import java.util.Collection;
 @Controller
 public class DocumentController {
 
-    private DocumentDao documentDao;
-    private DocumentService documentService;
-
-
     @Autowired
-    public DocumentController(DocumentDao documentDao, DocumentService documentService) {
-        this.documentDao = documentDao;
-        this.documentService = documentService;
-    }
+    private DocumentDao documentDao;
+    @Autowired
+    private DocumentService documentService;
 
     @RequestMapping("/headers")
     @ResponseBody

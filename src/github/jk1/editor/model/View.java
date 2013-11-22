@@ -26,7 +26,7 @@ public class View {
     private final diff_match_patch diffMatchPatch;
 
     private final Document document;
-    private final String editorInstanceName;
+    private final String token;
     private String shadow;
     private String backupShadow;
     private int shadowClientVersion = 0;
@@ -40,10 +40,10 @@ public class View {
      */
     private LinkedList<Diff> editStack = new LinkedList<>();
 
-    public View(diff_match_patch diffMatchPatch, Document document, String editorInstanceName) {
+    public View(diff_match_patch diffMatchPatch, Document document, String token) {
         this.diffMatchPatch = diffMatchPatch;
         this.document = document;
-        this.editorInstanceName = editorInstanceName;
+        this.token = token;
         this.shadow = document.getText();
         this.shadow = document.getTitle();
     }
@@ -70,7 +70,7 @@ public class View {
     }
 
     private void rollback() {
-        LOGGER.info("Rolling back view " + editorInstanceName + " of document " + document.getId());
+        LOGGER.info("Rolling back view " + token + " of document " + document.getId());
         this.shadow = backupShadow;
         this.shadowServerVersion = backUpShadowServerVersion;
         editStack.clear();
@@ -154,7 +154,7 @@ public class View {
         shadowServerVersion++;
         shadow = masterText;
         MobWriteMessage message = new MobWriteMessage(
-                clientMessage.getDocumentName(), clientMessage.getEditorName(), shadowClientVersion);
+                clientMessage.getDocumentName(), clientMessage.getToken(), shadowClientVersion);
         for (Diff element : editStack) {
             message.addDiff(element);
         }

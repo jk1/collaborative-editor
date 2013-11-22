@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="AppEngine ORM">
     <CLASSES>
-      <root url="file://C:/soft/appengine-java-sdk-1.8.7/lib/user/orm" />
+      <root url="file://C:/Soft/appengine-java-sdk-1.8.7/lib/user/orm" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
