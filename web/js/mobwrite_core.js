@@ -282,6 +282,14 @@ mobwrite.shareObj.prototype.getClientText = function() {
   return '';
 };
 
+/**
+ * Get current user's caret position.
+ * @return symbol count from the beginning of the text to the caret.
+ */
+mobwrite.shareObj.prototype.getCaretPosition = function() {
+    window.alert('Defined by subclass');
+    return '';
+};
 
 /**
  * Set the user's text based on the provided plaintext.
@@ -414,7 +422,10 @@ mobwrite.syncRun1_ = function() {
       if (mobwrite.nullifyAll) {
         data.push(mobwrite.shared[x].nullify());
       } else {
-        data.push(mobwrite.shared[x].syncText());
+        var delta = mobwrite.shared[x].syncText();
+          if (delta) {
+              data.push(delta);
+          }
       }
       empty = false;
     }
@@ -433,17 +444,6 @@ mobwrite.syncRun1_ = function() {
     }
     mobwrite.syncRun2_('\n\n');
     return;
-  }
-  if (data[1].match(/\=\d*\n$/)) { //tries to filter no-diff sync calls
-      if (mobwrite.force) {
-          mobwrite.force = false;  // force flag works only once
-      } else {
-          if (mobwrite.debug) {
-              window.console.info('Nothing to publish, skipping server sync');
-          }
-          mobwrite.syncRun2_('\n\n');
-          return;
-      }
   }
 
   var remote = (mobwrite.syncGateway.indexOf('://') != -1);
@@ -613,6 +613,7 @@ mobwrite.syncRun2_ = function(text) {
   var lines = text.split('\n');
   var file = null;
   var clientVersion = null;
+  var cursors = [];
   for (var i = 0; i < lines.length; i++) {
     var line = lines[i];
     if (!line) {
@@ -758,9 +759,16 @@ mobwrite.syncRun2_ = function(text) {
           }
         }
       }
+    } else if (name == 'c'){
+        // other user's cursor position
+        cursors.push(parseInt(value, 10));
     }
   }
-
+  // having all changes merged we can put cursors in place
+  if (file && file.applyCursors){
+      file.applyCursors(cursors);
+  }
+  //and recompute sync intervals
   mobwrite.computeSyncInterval_();
 
   // Ensure that there is only one sync task.

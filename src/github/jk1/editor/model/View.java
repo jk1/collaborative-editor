@@ -32,7 +32,11 @@ public class View {
     private int shadowClientVersion = 0;
     private int shadowServerVersion = 0;
     private int backUpShadowServerVersion = 0;
+    /**
+     * State flag for any kind of communication errors: parsing problems, delta version mismatch, etc.
+     */
     private boolean deltaOk = true;
+    private volatile int cursorPosition = 0;
 
     /**
      * Pending diffs to be sent to the client. We can accumulate diffs here
@@ -51,9 +55,6 @@ public class View {
     /**
      * Applies client diff message to the current view and generates response
      * diff for the client.
-     *
-     * @param clientMessage
-     * @return
      */
     public synchronized MobWriteMessage apply(MobWriteMessage clientMessage) {
         LOGGER.info(clientMessage.toString());
@@ -64,8 +65,14 @@ public class View {
         }
         this.dropObsoleteEditStackRecords(clientMessage.getVersion());
         for (Diff diff : clientMessage.getDiffs()) {
-            diff.getMode().applyToView(this, clientMessage, diff);
+            if (diff.getMode() == DiffMode.DELTA){
+                this.processDelta(clientMessage, diff);
+            } else {
+                this.processRaw(clientMessage, diff);
+                break; // later deltas make little sense on the server copy
+            }
         }
+        this.cursorPosition = clientMessage.getCursorPosition();
         return this.generateResponse(clientMessage);
     }
 
@@ -103,7 +110,11 @@ public class View {
                 shadow = diffMatchPatch.diff_text2(diffs);
                 backupShadow = shadow;
                 backUpShadowServerVersion = shadowServerVersion;
-                document.setText(diffMatchPatch.patch_apply(patches, document.getText())[0].toString());
+                String newText = diffMatchPatch.patch_apply(patches, document.getText())[0].toString();
+                if (!newText.equals(document.getText())) {
+                    clientMessage.setDeltaEmpty(false);
+                    document.setText(newText);
+                }
             }
         }
     }
@@ -158,6 +169,11 @@ public class View {
         for (Diff element : editStack) {
             message.addDiff(element);
         }
+        message.setResponseCursors(document.getConcurrentCursors(clientMessage.getToken()));
         return message;
+    }
+
+    public int getCursorPosition() {
+        return cursorPosition;
     }
 }

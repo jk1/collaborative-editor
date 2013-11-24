@@ -47,13 +47,15 @@ public class DocumentService {
 
     /**
      * @param document
-     * @param message
+     * @param request
      * @return
      */
-    public MobWriteMessage applyClientMessage(Document document, final MobWriteMessage message) {
-        View view = document.getView(message.getToken());
-        MobWriteMessage response = view.apply(message);
-        clientChannelService.broadcastDocumentUpdate(document, message.getToken());
+    public MobWriteMessage applyClientMessage(Document document, MobWriteMessage request) {
+        View view = document.getView(request.getToken());
+        MobWriteMessage response = view.apply(request);
+        if (!request.isDeltaEmpty()) {
+            clientChannelService.broadcastDocumentUpdate(document, request.getToken());
+        }
         return response;
     }
 }

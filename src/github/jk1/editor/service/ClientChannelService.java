@@ -2,8 +2,8 @@ package github.jk1.editor.service;
 
 import com.google.appengine.api.channel.ChannelMessage;
 import com.google.appengine.api.channel.ChannelService;
+import com.google.appengine.api.channel.ChannelServiceFactory;
 import github.jk1.editor.model.Document;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -24,30 +24,35 @@ import java.util.logging.Logger;
 public class ClientChannelService {
 
     private static final Logger LOGGER = Logger.getLogger(ClientChannelService.class.getName());
-
-    @Autowired
-    private ChannelService channelService;
+    private ChannelService channelService = ChannelServiceFactory.getChannelService();
     private Set<String> channelTokens = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
 
-    private enum MessageKey {UPDATE_LIST, UPDATE_DOCUMENT}
+    public static enum MessageKey {UPDATE_LIST, UPDATE_DOCUMENT}
 
     /**
      * Generates unique string token for document editor instance.
      * Single user may own multiple tokens, one for every browser window opened.
+     * This token will not be a subject of broadcast until it is registered.
      *
      * @return newly generated unique token string
      */
     public String createToken() {
-        String token = channelService.createChannel(UUID.randomUUID().toString());
+        String token = channelService.createChannel(UUID.randomUUID().toString(), 24 * 60 - 1); // 1 day
         LOGGER.info("New channel token created: " + token);
         return token;
     }
 
+    /**
+     * Register token for update message broadcasts
+     */
     public void registerToken(String token) {
         LOGGER.info("New channel token registered: " + token);
         channelTokens.add(token);
     }
 
+    /**
+     * Removes token from update broadcast list
+     */
     public void deleteToken(String token) {
         channelTokens.remove(token);
         LOGGER.info("Channel token removed: " + token);
@@ -79,4 +84,7 @@ public class ClientChannelService {
             channelService.sendMessage(new ChannelMessage(token, key.toString()));
         }
     }
+
+
+
 }

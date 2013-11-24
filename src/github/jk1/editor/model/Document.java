@@ -2,9 +2,7 @@ package github.jk1.editor.model;
 
 import name.fraser.neil.plaintext.diff_match_patch;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -43,11 +41,21 @@ public class Document {
         return view;
     }
 
-    public Collection<String> getSubscribers(){
-       return new HashSet<>(views.keySet()); // defensive copy
+    public List<Integer> getConcurrentCursors(String authorToken) {
+        List<Integer> cursors = new ArrayList<>(views.size());
+        for (Map.Entry<String, View> entry : views.entrySet()) {
+            if (!entry.getKey().equals(authorToken)) {
+                cursors.add(entry.getValue().getCursorPosition());
+            }
+        }
+        return cursors;
     }
 
-    public void deleteView(String token){
+    public Collection<String> getSubscribers() {
+        return new HashSet<>(views.keySet()); // defensive copy
+    }
+
+    public void deleteView(String token) {
         views.remove(token);
     }
 

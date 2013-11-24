@@ -6,7 +6,7 @@
     <link rel="icon" href="${pageContext.request.contextPath}/img/favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/img/favicon.ico" type="image/x-icon" />
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="${pageContext.request.contextPath}/css/styles.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/css/editor.css" rel="stylesheet">
 </head>
 <body>
 <div id="wrap">
@@ -43,7 +43,8 @@
                         <span class="glyphicon glyphicon-pencil"></span> &nbsp;<span id="title"></span>
                     </div>
                     <div class="panel-body">
-                        <textarea class="document-area"></textarea>
+                        <div class="shadow editor" style=""></div>
+                        <div class="document-area editor" contenteditable="true" style=""></div>
                     </div>
                 </div>
             </div>
@@ -56,7 +57,7 @@
              alt="Powered by Google App Engine"/>
     </div>
 </div>
-<!--speed up page load a bit-->
+<%-- speed up page load a bit --%>
 <script>
    var channelToken = "${token}";
 </script>
@@ -65,7 +66,7 @@
 <script type="text/javascript" src="/_ah/channel/jsapi"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/diff_match_patch_uncompressed.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/mobwrite_core.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/mobwrite_form.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/mobwrite_div.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/transport.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/action_handler.js"></script>
 </body>
