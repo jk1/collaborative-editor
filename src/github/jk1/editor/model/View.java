@@ -56,7 +56,7 @@ public class View {
      * Applies client diff message to the current view and generates response
      * diff for the client.
      */
-    public synchronized MobWriteMessage apply(MobWriteMessage clientMessage) {
+    public synchronized MobWriteResponse apply(MobWriteRequest clientMessage) {
         LOGGER.info(clientMessage.toString());
         if (clientMessage.getVersion() != shadowServerVersion
                 && clientMessage.getVersion() == backUpShadowServerVersion) {
@@ -101,7 +101,7 @@ public class View {
         editStack.clear();
     }
 
-    void processDelta(MobWriteMessage clientMessage, Diff diff) {
+    void processDelta(MobWriteRequest clientMessage, Diff diff) {
         if (this.assertDelta(clientMessage, diff)) {
             LinkedList<diff_match_patch.Diff> diffs = diffMatchPatch.diff_fromDelta(shadow, diff.getPayload());
             shadowClientVersion++;
@@ -150,7 +150,7 @@ public class View {
      * @return raw mobwrite protocol clientMessage for the client
      * @see <a href="https://code.google.com/p/google-mobwrite/wiki/Protocol">MobWrite protocol reference</a>
      */
-    private MobWriteMessage generateResponse(MobWriteMessage clientMessage) {
+    private MobWriteResponse generateResponse(MobWriteMessage clientMessage) {
         String masterText = document.getText();
         Diff diff;
         if (deltaOk) {
@@ -164,7 +164,7 @@ public class View {
         editStack.add(diff);
         shadowServerVersion++;
         shadow = masterText;
-        MobWriteMessage message = new MobWriteMessage(
+        MobWriteResponse message = new MobWriteResponse(
                 clientMessage.getDocumentName(), clientMessage.getToken(), shadowClientVersion);
         for (Diff element : editStack) {
             message.addDiff(element);

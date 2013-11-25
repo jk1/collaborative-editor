@@ -4,6 +4,7 @@ import github.jk1.editor.model.Document;
 import github.jk1.editor.model.DocumentHeader;
 import github.jk1.editor.model.MobWriteMessage;
 import github.jk1.editor.dao.DocumentDao;
+import github.jk1.editor.model.MobWriteRequest;
 import github.jk1.editor.service.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,7 +43,7 @@ public class DocumentController {
     @ResponseBody
     public String postChanges(@PathVariable Integer id, InputStream stream) throws IOException {
         Document document = documentDao.getDocument(id);
-        MobWriteMessage message = MobWriteMessage.fromStream(stream);
+        MobWriteRequest message = new MobWriteRequest(stream);
         return documentService.applyClientMessage(document, message).asString();
     }
 

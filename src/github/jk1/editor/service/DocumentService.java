@@ -1,10 +1,7 @@
 package github.jk1.editor.service;
 
 import github.jk1.editor.dao.DocumentDao;
-import github.jk1.editor.model.Document;
-import github.jk1.editor.model.DocumentHeader;
-import github.jk1.editor.model.MobWriteMessage;
-import github.jk1.editor.model.View;
+import github.jk1.editor.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,9 +47,9 @@ public class DocumentService {
      * @param request
      * @return
      */
-    public MobWriteMessage applyClientMessage(Document document, MobWriteMessage request) {
+    public MobWriteResponse applyClientMessage(Document document, MobWriteRequest request) {
         View view = document.getView(request.getToken());
-        MobWriteMessage response = view.apply(request);
+        MobWriteResponse response = view.apply(request);
         if (!request.isDeltaEmpty()) {
             clientChannelService.broadcastDocumentUpdate(document, request.getToken());
         }
