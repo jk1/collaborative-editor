@@ -32,3 +32,7 @@ transport.getDocumentHeaders = function (callback) {
 transport.createDocument = function (name) {
     $.post("document", {'name': name});
 };
+
+transport.dropView = function (token) {
+    $.post("document/dropview", {'token': token});
+};

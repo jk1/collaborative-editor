@@ -64,12 +64,12 @@ mobwrite.shareDiv.prototype.setClientText = function (text) {
                 else {
                     $(obj).css('visibility', 'visible');
                 }
-            }, 500);
+            }, 750);
         });
     }
 }(jQuery));
 
-function isOrContains(node, container) {
+mobwrite.shareDiv.prototype.isOrContains = function(node, container) {
     while (node) {
         if (node === container) {
             return true;
@@ -77,33 +77,59 @@ function isOrContains(node, container) {
         node = node.parentNode;
     }
     return false;
-}
+};
 
-function elementContainsSelection(el) {
+mobwrite.shareDiv.prototype.elementContainsSelection = function(el) {
     var sel;
     if (window.getSelection) {
         sel = window.getSelection();
         if (sel.rangeCount > 0) {
             for (var i = 0; i < sel.rangeCount; ++i) {
-                if (!isOrContains(sel.getRangeAt(i).commonAncestorContainer, el)) {
+                if (!this.isOrContains(sel.getRangeAt(i).commonAncestorContainer, el)) {
                     return false;
                 }
             }
             return true;
         }
     } else if ((sel = document.selection) && sel.type != "Control") {
-        return isOrContains(sel.createRange().parentElement(), el);
+        return this.isOrContains(sel.createRange().parentElement(), el);
     }
     return false;
-}
+};
+
+mobwrite.shareDiv.prototype.previousNode = function(baseNode) {
+    if (baseNode.previousSibling) {
+        return baseNode.previousSibling;
+    } else {
+        var parent = baseNode.parentElement;
+        if (parent && parent != this.element && parent.previousSibling) {
+            if (parent.previousSibling.childNodes[0]) {
+                return parent.previousSibling.childNodes[0];
+            } else {
+                return parent.previousSibling;
+            }
+        }
+    }
+};
 
 mobwrite.shareDiv.prototype.getCursorOffset = function () {
-    if (elementContainsSelection(this.element)) {
-        return window.getSelection().baseOffset;
+    if (this.elementContainsSelection(this.element)) {
+        var baseNode = window.getSelection().baseNode;
+        var offset = window.getSelection().baseOffset;
+        while (baseNode = this.previousNode(baseNode)) {
+            if (baseNode.data) {
+                offset += baseNode.data.length;
+            } else {
+                offset++;
+            }
+        }
+        return offset;
     } else {
         return 0;
     }
+};
 
+mobwrite.shareDiv.prototype.setCursorOffset = function (offset) {
 
 };
 
@@ -329,6 +355,15 @@ mobwrite.shareDiv.prototype.patch_apply_ =
         return text;
     };
 
+function toHtml(text) {
+    return text.replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '\n<br>');
+}
+
 //cursors supposed to asc sorted
 mobwrite.shareDiv.prototype.applyCursors = function (cursors) {
     if (cursors.length > 0) {
@@ -340,14 +375,9 @@ mobwrite.shareDiv.prototype.applyCursors = function (cursors) {
         for (var i = 0; i < cursors.length; i++) {
             floor = ceil;
             ceil = cursors[i];
-            chunks.push(text.substr(floor, ceil).replace('\n', '\n<br>')
-                .replace(/&/g, '&amp;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;'));
+            chunks.push(toHtml(text.substr(floor, ceil)));
         }
-        chunks.push(text.substr(ceil, text.length));
+        chunks.push(toHtml(text.substr(ceil, text.length)));
         shadow.html(chunks.join('<span class="cursor"></span>'));
         jQuery('.cursor').blink();
     }
@@ -363,7 +393,7 @@ mobwrite.shareDiv.prototype.captureCursor_ = function () {
     var text = this.element.innerText;
     var cursor = {};
     var curPosition = this.getCursorOffset();
-    if (elementContainsSelection(this.element)) {  // W3
+    if (this.elementContainsSelection(this.element)) {  // W3
         try {
             var selectionStart = curPosition;
             var selectionEnd = curPosition;
@@ -490,7 +520,7 @@ mobwrite.shareDiv.prototype.restoreCursor_ = function (cursor) {
     }
 
     // Restore selection.
-    if (elementContainsSelection(this.element)) {  // W3
+    if (this.elementContainsSelection(this.element)) {  // W3
         var range = document.createRange();
         var sel = window.getSelection();
         range.setStart(this.element.childNodes[0], 5);

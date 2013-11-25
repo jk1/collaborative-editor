@@ -140,7 +140,7 @@ public class MobWriteMessage {
 
     @Override
     public String toString() {
-        String template = "[Document: %s, server: %d, diffs: %s, editor name: %s]";
-        return String.format(template, documentName, version, diffs, token);
+        String template = "[Document: %s, server: %d, diffs: %s, editor name: %s, cursor position: %d]";
+        return String.format(template, documentName, version, diffs, token, cursorPosition);
     }
 }

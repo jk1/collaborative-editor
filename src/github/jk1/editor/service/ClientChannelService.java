@@ -3,6 +3,7 @@ package github.jk1.editor.service;
 import com.google.appengine.api.channel.ChannelMessage;
 import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
+import github.jk1.editor.dao.NotFoundException;
 import github.jk1.editor.model.Document;
 import org.springframework.stereotype.Service;
 
@@ -34,12 +35,13 @@ public class ClientChannelService {
      * Single user may own multiple tokens, one for every browser window opened.
      * This token will not be a subject of broadcast until it is registered.
      *
-     * @return newly generated unique token string
+     * @return newly generated unique token
      */
-    public String createToken() {
-        String token = channelService.createChannel(UUID.randomUUID().toString(), 24 * 60 - 1); // 1 day
+    public ChannelTokenCredentials createToken() {
+        String clientId = UUID.randomUUID().toString();
+        String token = channelService.createChannel(clientId, 24 * 60 - 1); // 1 day
         LOGGER.info("New channel token created: " + token);
-        return token;
+        return new ChannelTokenCredentials(token, clientId);
     }
 
     /**
@@ -85,6 +87,13 @@ public class ClientChannelService {
         }
     }
 
+    public static class ChannelTokenCredentials{
+        public final String token;
+        public final String clientId;
 
-
+        private ChannelTokenCredentials(String token, String clientId) {
+            this.token = token;
+            this.clientId = clientId;
+        }
+    }
 }

@@ -35,7 +35,7 @@ public class DocumentController {
     @RequestMapping(value = "/document", method = RequestMethod.POST)
     @ResponseBody
     public void createDocument(@RequestParam String name) {
-       documentService.createDocument(name);
+        documentService.createDocument(name);
     }
 
     @RequestMapping(value = "/document/{id}", method = RequestMethod.POST)
@@ -44,5 +44,11 @@ public class DocumentController {
         Document document = documentDao.getDocument(id);
         MobWriteMessage message = MobWriteMessage.fromStream(stream);
         return documentService.applyClientMessage(document, message).asString();
+    }
+
+    @RequestMapping(value = "/document/dropview", method = RequestMethod.POST)
+    @ResponseBody
+    public void dropView(@RequestParam String token) throws IOException {
+        documentService.deleteView(token);
     }
 }

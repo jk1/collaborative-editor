@@ -25,10 +25,11 @@ public class MainPageController {
 
     @RequestMapping(value = {"/index", "/"}, method = RequestMethod.GET)
     public ModelAndView getEditorPage(HttpServletRequest request) {
-        String token = clientChannelService.createToken();
+        ClientChannelService.ChannelTokenCredentials credentials = clientChannelService.createToken();
         ModelAndView mav = new ModelAndView("editor");
         mav.addObject("logoutUrl", userService.createLogoutURL(request.getRequestURI()));
-        mav.addObject("token", token);
+        mav.addObject("token", credentials.token);
+        mav.addObject("clientId", credentials.clientId);
         return mav;
     }
 }

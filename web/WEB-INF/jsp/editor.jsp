@@ -43,8 +43,10 @@
                         <span class="glyphicon glyphicon-pencil"></span> &nbsp;<span id="title"></span>
                     </div>
                     <div class="panel-body">
-                        <div class="shadow editor"></div>
-                        <div class="document-area editor" contenteditable="true"></div>
+                        <div class="editor-wrapper">
+                            <div class="shadow editor"></div>
+                            <div class="document-area editor" contenteditable="true"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -60,6 +62,7 @@
 <%-- speed up page load a bit --%>
 <script>
    var channelToken = "${token}";
+   var clientId = "${clientId}";
 </script>
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>

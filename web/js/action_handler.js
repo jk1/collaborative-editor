@@ -12,15 +12,16 @@ $(document).ready(function () {
     action_handler.refreshDocumentList();
     //bind event handlers
     $('#createDocument').on('click', createDocumentOnClick);
-    $('.document-area').resize(function (e) {
-        e.target.css('margin-top', '-' + e.target.height + 'px');
-        $('.shadow').css('min-height', e.target.height + 'px');
+    $('.document-area').on("DOMSubtreeModified",function (e) {
+        var height = $('.document-area').height();
+        $('.shadow').css('min-height', height + 18 + 'px');
+        $('.editor-wrapper').css('min-height',  height + 23 + 'px');
     });
 });
 
 action_handler.setupMobwriteClient = function () {
     //mobwrite.debug = true;
-    mobwrite.syncUsername = channelToken;
+    mobwrite.syncUsername = clientId;
     //adaptive diff check, the more active a user is, the less time we wait between diff checks
     mobwrite.maxSyncInterval = 1000;
     mobwrite.minSyncInterval = 500;
@@ -47,6 +48,7 @@ function documentListOnClick(e) {
     //stop remote document sharing for the old document, if any
     editor = $('.document-area');
     mobwrite.unshare(editor[0]);
+    transport.dropView(clientId);
     //switch to a new document
     $('#documentPanel').show();
     $('#title').text(e.target.innerText);

@@ -29,7 +29,7 @@ public class ClientChannelServiceTest {
         helper.setUp();
         channelManager = LocalChannelServiceTestConfig.getLocalChannelService().getChannelManager();
         service = new ClientChannelService();
-        token = service.createToken();
+        token = service.createToken().token;
         connectionId = channelManager.connectClient(token);
     }
 
@@ -72,7 +72,7 @@ public class ClientChannelServiceTest {
     @Test
     public void testBroadcastDocumentUpdateToDocumentEditorsOnly() {
         service.registerToken(token);
-        String editorToken = service.createToken();
+        String editorToken = service.createToken().token;
         String editorConnectionId = channelManager.connectClient(editorToken);
         service.registerToken(editorToken);
         Document document = new Document(null, new DocumentHeader(1, ""));
@@ -89,7 +89,7 @@ public class ClientChannelServiceTest {
     @Test
     public void testNoDocumentUpdateBroadcastToAuthor() {
         service.registerToken(token);
-        String authorToken = service.createToken();
+        String authorToken = service.createToken().token;
         String authorConnectionId = channelManager.connectClient(authorToken);
         service.registerToken(authorToken);
         Document document = new Document(null, new DocumentHeader(1, ""));
