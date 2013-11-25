@@ -43,8 +43,8 @@
                         <span class="glyphicon glyphicon-pencil"></span> &nbsp;<span id="title"></span>
                     </div>
                     <div class="panel-body">
-                        <div class="shadow editor" style=""></div>
-                        <div class="document-area editor" contenteditable="true" style=""></div>
+                        <div class="shadow editor"></div>
+                        <div class="document-area editor" contenteditable="true"></div>
                     </div>
                 </div>
             </div>
