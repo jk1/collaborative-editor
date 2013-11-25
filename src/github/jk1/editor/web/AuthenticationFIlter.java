@@ -30,11 +30,6 @@ public class AuthenticationFilter implements Filter {
     private UserService userService;
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        // noop
-    }
-
-    @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
         UserService userService = UserServiceFactory.getUserService();
@@ -59,6 +54,11 @@ public class AuthenticationFilter implements Filter {
             }
         }
         return false;
+    }
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // noop
     }
 
     @Override
