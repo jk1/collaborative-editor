@@ -12,6 +12,10 @@ $(document).ready(function () {
     action_handler.refreshDocumentList();
     //bind event handlers
     $('#createDocument').on('click', createDocumentOnClick);
+    $('.document-area').resize(function (e) {
+        e.target.css('margin-top', '-' + e.target.height + 'px');
+        $('.shadow').css('min-height', e.target.height + 'px');
+    });
 });
 
 action_handler.setupMobwriteClient = function () {
@@ -46,7 +50,7 @@ function documentListOnClick(e) {
     //switch to a new document
     $('#documentPanel').show();
     $('#title').text(e.target.innerText);
-    editor.attr('id' ,'document_' + e.target.id);
+    editor.attr('id', 'document_' + e.target.id);
     editor.val('');
     // start remote sharing for a new document
     mobwrite.syncGateway = '/document/' + e.target.id;

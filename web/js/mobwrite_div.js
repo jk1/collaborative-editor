@@ -50,6 +50,25 @@ mobwrite.shareDiv.prototype.setClientText = function (text) {
     this.fireChange(this.element);
 };
 
+/**
+ * Tiny JQuery extension to make other user's cursors blink
+ */
+(function ($) {
+    $.fn.blink = function () {
+        return this.each(function () {
+            var obj = $(this);
+            setInterval(function () {
+                if ($(obj).css("visibility") == "visible") {
+                    $(obj).css('visibility', 'hidden');
+                }
+                else {
+                    $(obj).css('visibility', 'visible');
+                }
+            }, 500);
+        });
+    }
+}(jQuery));
+
 function isOrContains(node, container) {
     while (node) {
         if (node === container) {
@@ -330,6 +349,7 @@ mobwrite.shareDiv.prototype.applyCursors = function (cursors) {
         }
         chunks.push(text.substr(ceil, text.length));
         shadow.html(chunks.join('<span class="cursor"></span>'));
+        jQuery('.cursor').blink();
     }
 };
 
@@ -342,10 +362,11 @@ mobwrite.shareDiv.prototype.captureCursor_ = function () {
     var padLength = this.dmp.Match_MaxBits / 2;  // Normally 16.
     var text = this.element.innerText;
     var cursor = {};
-    if ('selectionStart' in this.element) {  // W3
+    var curPosition = this.getCursorOffset();
+    if (elementContainsSelection(this.element)) {  // W3
         try {
-            var selectionStart = this.element.selectionStart;
-            var selectionEnd = this.element.selectionEnd;
+            var selectionStart = curPosition;
+            var selectionEnd = curPosition;
         } catch (e) {
             // No cursor; the element may be "display:none".
             return null;
@@ -469,11 +490,15 @@ mobwrite.shareDiv.prototype.restoreCursor_ = function (cursor) {
     }
 
     // Restore selection.
-    if ('selectionStart' in this.element) {  // W3
-        this.element.selectionStart = cursorStartPoint;
-        this.element.selectionEnd = cursorEndPoint;
+    if (elementContainsSelection(this.element)) {  // W3
+        var range = document.createRange();
+        var sel = window.getSelection();
+        range.setStart(this.element.childNodes[0], 5);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
     } else {  // IE
-        // Walk up the tree looking for this textarea's document node.
+        // Walk up the tree looking for this divs's document node.
         var doc = this.element;
         while (doc.parentNode) {
             doc = doc.parentNode;
