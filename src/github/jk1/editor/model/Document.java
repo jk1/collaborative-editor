@@ -6,8 +6,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * <p/>
- * Document instances are thread-safe.
+ * Represents an editable text unit. Each document maintains a set of views,
+ * one view for each active editor. Document instances are thread-safe,
+ * although external synchronization is necessary to perform getText()/setText() call pair.
  *
  * @author Evgeny Naumenko
  */
@@ -27,10 +28,7 @@ public class Document {
 
     /**
      * Returns a View object for the given unique editor instance name.
-     * If no view can be found, a new one is created.
-     *
-     * @param token
-     * @return
+     * If no view can be found, a new one is created and returned.
      */
     public synchronized View getView(String token) {
         View view = views.get(token);
@@ -41,6 +39,12 @@ public class Document {
         return view;
     }
 
+    /**
+     * Returns a list of cursor offset for all active document editors
+     * but the current user. Current user is identified by unique user token
+     *
+     * todo: this logic probably does not belong here
+     */
     public List<Integer> getConcurrentCursors(String authorToken) {
         List<Integer> cursors = new ArrayList<>(views.size());
         for (Map.Entry<String, View> entry : views.entrySet()) {
@@ -51,7 +55,10 @@ public class Document {
         return cursors;
     }
 
-    public Collection<String> getSubscribers() {
+    /**
+     * @return list of users currently wirking with this document
+     */
+    public Collection<String> getEditors() {
         return new HashSet<>(views.keySet()); // defensive copy
     }
 

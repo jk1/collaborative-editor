@@ -23,8 +23,8 @@ import java.util.logging.Logger;
 public class View {
 
     private static final Logger LOGGER = Logger.getLogger(View.class.getName());
-    private final diff_match_patch diffMatchPatch;
 
+    private final diff_match_patch diffMatchPatch;
     private final Document document;
     private final String token;
     private String shadow;
@@ -36,6 +36,9 @@ public class View {
      * State flag for any kind of communication errors: parsing problems, delta version mismatch, etc.
      */
     private boolean deltaOk = true;
+    /**
+     * Owner's cursor position at the moment of the last update. Volatile as getter is not synchronized
+     */
     private volatile int cursorPosition = 0;
 
     /**
@@ -58,6 +61,7 @@ public class View {
      */
     public synchronized MobWriteResponse apply(MobWriteRequest clientMessage) {
         LOGGER.info(clientMessage.toString());
+        deltaOk = true;
         if (clientMessage.getVersion() != shadowServerVersion
                 && clientMessage.getVersion() == backUpShadowServerVersion) {
             //client missed the last update, rollback the shadow
@@ -65,7 +69,7 @@ public class View {
         }
         this.dropObsoleteEditStackRecords(clientMessage.getVersion());
         for (Diff diff : clientMessage.getDiffs()) {
-            if (diff.getMode() == DiffMode.DELTA){
+            if (diff.getMode() == Diff.Mode.DELTA) {
                 this.processDelta(clientMessage, diff);
             } else {
                 this.processRaw(clientMessage, diff);
@@ -92,7 +96,10 @@ public class View {
         }
     }
 
-    void processRaw(MobWriteMessage clientMessage, Diff diff) {
+    /**
+     * Handles client request for entire raw document state
+     */
+    private void processRaw(MobWriteMessage clientMessage, Diff diff) {
         shadow = diff.getPayload();
         shadowClientVersion = diff.getVersion();
         shadowServerVersion = clientMessage.getVersion();
@@ -101,21 +108,29 @@ public class View {
         editStack.clear();
     }
 
-    void processDelta(MobWriteRequest clientMessage, Diff diff) {
-        if (this.assertDelta(clientMessage, diff)) {
-            LinkedList<diff_match_patch.Diff> diffs = diffMatchPatch.diff_fromDelta(shadow, diff.getPayload());
-            shadowClientVersion++;
-            synchronized (document) {
-                LinkedList<diff_match_patch.Patch> patches = diffMatchPatch.patch_make(shadow, diffs);
-                shadow = diffMatchPatch.diff_text2(diffs);
-                backupShadow = shadow;
-                backUpShadowServerVersion = shadowServerVersion;
-                String newText = diffMatchPatch.patch_apply(patches, document.getText())[0].toString();
-                if (!newText.equals(document.getText())) {
-                    clientMessage.setDeltaEmpty(false);
-                    document.setText(newText);
+    /**
+     * Handles client's post of incremental delta
+     */
+    private void processDelta(MobWriteRequest clientMessage, Diff diff) {
+        try {
+            if (this.assertDelta(clientMessage, diff)) {
+                LinkedList<diff_match_patch.Diff> diffs = diffMatchPatch.diff_fromDelta(shadow, diff.getPayload());
+                shadowClientVersion++;
+                synchronized (document) {
+                    LinkedList<diff_match_patch.Patch> patches = diffMatchPatch.patch_make(shadow, diffs);
+                    shadow = diffMatchPatch.diff_text2(diffs);
+                    backupShadow = shadow;
+                    backUpShadowServerVersion = shadowServerVersion;
+                    String newText = diffMatchPatch.patch_apply(patches, document.getText())[0].toString();
+                    if (!newText.equals(document.getText())) {
+                        clientMessage.setDeltaEmpty(false);
+                        document.setText(newText);
+                    }
                 }
             }
+        } catch (IllegalArgumentException e) {
+            deltaOk = false;
+            LOGGER.warning("Delta application failure: " + e.getMessage());
         }
     }
 
@@ -146,33 +161,35 @@ public class View {
      * to the client as a new shared text base, effectively voiding client changes.
      * Sad, but true.
      *
-     * @param clientMessage client request to prepare a response for
+     * @param req client request to prepare a response for
      * @return raw mobwrite protocol clientMessage for the client
      * @see <a href="https://code.google.com/p/google-mobwrite/wiki/Protocol">MobWrite protocol reference</a>
      */
-    private MobWriteResponse generateResponse(MobWriteMessage clientMessage) {
+    private MobWriteResponse generateResponse(MobWriteMessage req) {
         String masterText = document.getText();
         Diff diff;
         if (deltaOk) {
             LinkedList<diff_match_patch.Diff> diffs = diffMatchPatch.diff_main(shadow, masterText);
             String diffString = diffMatchPatch.diff_toDelta(diffs);
-            diff = new Diff(DiffMode.DELTA, shadowServerVersion, diffString);
+            diff = new Diff(Diff.Mode.DELTA, shadowServerVersion, diffString);
         } else {
             // server could not parse client's delta, sent raw response back
-            diff = new Diff(DiffMode.RAW, shadowServerVersion, masterText);
+            diff = new Diff(Diff.Mode.RAW, shadowServerVersion, masterText);
         }
         editStack.add(diff);
         shadowServerVersion++;
         shadow = masterText;
-        MobWriteResponse message = new MobWriteResponse(
-                clientMessage.getDocumentName(), clientMessage.getToken(), shadowClientVersion);
+        MobWriteResponse message = new MobWriteResponse(req.getDocumentName(), req.getToken(), shadowClientVersion);
         for (Diff element : editStack) {
             message.addDiff(element);
         }
-        message.setResponseCursors(document.getConcurrentCursors(clientMessage.getToken()));
+        message.setResponseCursors(document.getConcurrentCursors(req.getToken()));
         return message;
     }
 
+    /**
+     * @return owner's cursor position from last sync
+     */
     public int getCursorPosition() {
         return cursorPosition;
     }

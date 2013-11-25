@@ -28,7 +28,7 @@ public class MobWriteRequestTest {
         List<Diff> diffs = message.getDiffs();
         assertEquals(1, diffs.size());
         Diff diff = diffs.get(0);
-        assertEquals(DiffMode.DELTA, diff.getMode());
+        assertEquals(Diff.Mode.DELTA, diff.getMode());
         assertEquals(41, diff.getVersion());
         assertEquals("=200 -7  Hello =100", diff.getPayload());
     }

@@ -15,7 +15,7 @@ public class MobWriteResponseTest {
     @Test
     public void testAsString() throws Exception {
         MobWriteResponse message = new MobWriteResponse("abcdef", "fraser", 42);
-        message.addDiff(new Diff(DiffMode.DELTA, 34, "=305"));
+        message.addDiff(new Diff(Diff.Mode.DELTA, 34, "=305"));
 
         assertEquals(TEST_SERVER_RESPONSE, message.asString());
     }

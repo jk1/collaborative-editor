@@ -3,7 +3,6 @@ package github.jk1.editor.service;
 import com.google.appengine.api.channel.ChannelMessage;
 import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
-import github.jk1.editor.dao.NotFoundException;
 import github.jk1.editor.model.Document;
 import org.springframework.stereotype.Service;
 
@@ -76,7 +75,7 @@ public class ClientChannelService {
      * @param authorToken update author
      */
     public void broadcastDocumentUpdate(Document document, String authorToken) {
-        Collection<String> subscribers = document.getSubscribers();
+        Collection<String> subscribers = document.getEditors();
         subscribers.remove(authorToken);
         this.broadcast(subscribers, MessageKey.UPDATE_DOCUMENT);
     }

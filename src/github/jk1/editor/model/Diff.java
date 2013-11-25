@@ -8,14 +8,14 @@ package github.jk1.editor.model;
 public class Diff {
 
     private int version;
-    private DiffMode mode;
+    private Mode mode;
     private String payload;
 
     public Diff(char mode, int version, String payload) {
-        this('d' == mode ? DiffMode.DELTA : DiffMode.RAW, version, payload);
+        this(('d' == mode ? Mode.DELTA : Mode.RAW), version, payload);
     }
 
-    public Diff(DiffMode mode, int version, String payload) {
+    public Diff(Mode mode, int version, String payload) {
         this.version = version;
         this.mode = mode;
         this.payload = payload;
@@ -25,7 +25,7 @@ public class Diff {
         return version;
     }
 
-    public DiffMode getMode() {
+    public Mode getMode() {
         return mode;
     }
 
@@ -35,7 +35,32 @@ public class Diff {
 
     @Override
     public String toString() {
-        String template = mode == DiffMode.DELTA ? "d:%d:%s\n" : "R:%d:%s\n";
-        return String.format(template, version, payload);
+        return String.format(mode.getTemplate(), version, payload);
+    }
+
+    /**
+     * Diff string types:
+     * <p/>
+     * <ol>
+     * <li>Delta - diff between previous text version and a new one</li>
+     * <li>Raw - entire text content, for use cases when delta is not informative enough</li>
+     * </ol>
+     *
+     * @author Evgeny Naumenko
+     */
+    public static enum Mode {
+
+        DELTA("d:%d:%s\n"),
+        RAW("R:%d:%s\n");
+
+        private String template;
+
+        private Mode(String template) {
+            this.template = template;
+        }
+
+        public String getTemplate() {
+            return template;
+        }
     }
 }
