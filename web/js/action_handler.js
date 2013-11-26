@@ -59,7 +59,7 @@ function documentListOnClick(e) {
     $('#documentPanel').show();
     $('#title').text(e.target.innerText);
     editor.attr('id', 'document_' + e.target.id);
-    editor.val('');
+    editor.text('');
     // start remote sharing for a new document
     mobwrite.syncGateway = '/document/' + e.target.id;
     mobwrite.share(editor[0]);

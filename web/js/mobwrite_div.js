@@ -119,7 +119,8 @@ mobwrite.shareDiv.prototype.getCursorOffset = function () {
         while (baseNode = this.previousNode(baseNode)) {
             if (baseNode.data) {
                 offset += baseNode.data.length;
-            } else {
+            }
+            if (baseNode.tagName != 'DIV') {
                 offset++;
             }
         }

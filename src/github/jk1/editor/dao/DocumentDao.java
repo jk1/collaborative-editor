@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
@@ -48,7 +49,7 @@ public class DocumentDao {
     }
 
     public Collection<DocumentHeader> getAllDocumentHeaders() {
-        return documents.keySet();
+        return new TreeSet<>(documents.keySet());
     }
 
     public DocumentHeader createDocument(String name) {

@@ -115,12 +115,12 @@ public class View {
         try {
             if (this.assertDelta(clientMessage, diff)) {
                 LinkedList<diff_match_patch.Diff> diffs = diffMatchPatch.diff_fromDelta(shadow, diff.getPayload());
-                shadowClientVersion++;
-                synchronized (document) {
                     LinkedList<diff_match_patch.Patch> patches = diffMatchPatch.patch_make(shadow, diffs);
+                    shadowClientVersion++;
                     shadow = diffMatchPatch.diff_text2(diffs);
                     backupShadow = shadow;
                     backUpShadowServerVersion = shadowServerVersion;
+                synchronized (document) {
                     String newText = diffMatchPatch.patch_apply(patches, document.getText())[0].toString();
                     if (!newText.equals(document.getText())) {
                         clientMessage.setDeltaEmpty(false);
@@ -129,7 +129,6 @@ public class View {
                 }
             }
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
             deltaOk = false;
             LOGGER.warning("Delta application failure: " + e.getMessage());
         }
@@ -171,10 +170,12 @@ public class View {
         Diff diff;
         if (deltaOk) {
             LinkedList<diff_match_patch.Diff> diffs = diffMatchPatch.diff_main(shadow, masterText);
+            diffMatchPatch.diff_cleanupEfficiency(diffs);
             String diffString = diffMatchPatch.diff_toDelta(diffs);
             diff = new Diff(Diff.Mode.DELTA, shadowServerVersion, diffString);
         } else {
             // server could not parse client's delta, sent raw response back
+            shadowClientVersion++;
             diff = new Diff(Diff.Mode.RAW, shadowServerVersion, masterText);
         }
         editStack.add(diff);

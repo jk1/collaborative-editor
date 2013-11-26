@@ -10,7 +10,7 @@ package github.jk1.editor.model;
  *
  * @author Evvgeny Naumenko
  */
-public class DocumentHeader {
+public class DocumentHeader implements Comparable<DocumentHeader> {
     private final int id;
     private final String title;
 
@@ -29,6 +29,11 @@ public class DocumentHeader {
 
     public String getTitle() {
         return title;
+    }
+
+    @Override
+    public int compareTo(DocumentHeader o) {
+        return id - o.id;
     }
 
     @Override
