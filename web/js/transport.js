@@ -1,3 +1,10 @@
+/**
+ * Encapsulates all client-to-server communication except for MobWrite
+ * sync roundtrips (they are quite complex with own timeout handling).
+ *
+ * @author Evgeny Naumenko
+ */
+
 var transport = {};
 
 var channel;

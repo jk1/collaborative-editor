@@ -2,7 +2,6 @@ package github.jk1.editor.web;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
@@ -26,8 +25,7 @@ public class AuthenticationFilter implements Filter {
             "/img/"
     };
 
-    @Autowired
-    private UserService userService;
+    private UserService userService = UserServiceFactory.getUserService();
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)

@@ -1,8 +1,11 @@
+/**
+ * Handles user actions on main client's page
+ *
+ * @author Evgeny Naumenko
+ */
+
 var action_handler = {};
 
-/*
- * Initialize server connection & event handlers on document load
- */
 $(document).ready(function () {
     transport.openChannel(channelToken);
     action_handler.setupMobwriteClient();
@@ -12,12 +15,15 @@ $(document).ready(function () {
     action_handler.refreshDocumentList();
     //bind event handlers
     $('#createDocument').on('click', createDocumentOnClick);
-    $('.document-area').on("DOMSubtreeModified",function (e) {
-        var height = $('.document-area').height();
-        $('.shadow').css('min-height', height + 18 + 'px');
-        $('.editor-wrapper').css('min-height',  height + 23 + 'px');
-    });
+    $('.document-area').on("DOMSubtreeModified", action_handler.editor_resize);
 });
+
+action_handler.editor_resize = function(e) {
+    // I wish I could done it with CSS
+    var height = $('.document-area').height();
+    $('.shadow').css('min-height', height + 18 + 'px');
+    $('.editor-wrapper').css('min-height',  height + 23 + 'px');
+};
 
 action_handler.setupMobwriteClient = function () {
     //mobwrite.debug = true;

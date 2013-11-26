@@ -9,10 +9,6 @@
        http://www.springframework.org/schema/context/spring-context-3.1.xsd
        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd">
 
-    <bean class="com.google.appengine.api.channel.ChannelServiceFactory" factory-method="getChannelService"/>
-
-    <bean class="com.google.appengine.api.users.UserServiceFactory" factory-method="getUserService"/>
-
     <bean class="name.fraser.neil.plaintext.diff_match_patch">
         <constructor-arg name="semanticBreakScorer">
             <bean class="name.fraser.neil.plaintext.StandardBreakScorer"/>

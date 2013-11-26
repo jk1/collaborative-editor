@@ -1,6 +1,7 @@
 package github.jk1.editor.web;
 
 import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import github.jk1.editor.service.ClientChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,8 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class MainPageController {
 
-    @Autowired
-    private UserService userService;
+    private UserService userService = UserServiceFactory.getUserService();
+
     @Autowired
     private ClientChannelService clientChannelService;
 

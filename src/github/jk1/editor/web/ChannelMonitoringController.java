@@ -1,7 +1,7 @@
 package github.jk1.editor.web;
 
-import com.google.appengine.api.channel.ChannelPresence;
 import com.google.appengine.api.channel.ChannelService;
+import com.google.appengine.api.channel.ChannelServiceFactory;
 import github.jk1.editor.service.ClientChannelService;
 import github.jk1.editor.service.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +24,8 @@ import java.io.IOException;
 @RequestMapping("/_ah/channel")
 public class ChannelMonitoringController {
 
-    @Autowired
-    private ChannelService channelService;
+    private ChannelService channelService = ChannelServiceFactory.getChannelService();
+
     @Autowired
     private ClientChannelService clientChannelService;
     @Autowired
@@ -46,7 +46,6 @@ public class ChannelMonitoringController {
     }
 
     private String parseToken(HttpServletRequest request) throws IOException {
-        ChannelPresence presence = channelService.parsePresence(request);
-        return presence.clientId();
+        return channelService.parsePresence(request).clientId();
     }
 }
