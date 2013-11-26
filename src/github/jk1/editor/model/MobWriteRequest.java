@@ -7,21 +7,21 @@ import java.io.InputStreamReader;
 import java.net.URLDecoder;
 
 /**
- *
+ * Represents client sync request to the server.
+ * This request may contain diff information regarding client changes or
+ * just a sync request.
  * todo: introduce separate command handlers
  *
  * @author Evgeny Naumenko
+ * @see <a href="https://code.google.com/p/google-mobwrite/wiki/Protocol">MobWrite protocol reference</a>
  */
 public class MobWriteRequest extends MobWriteMessage {
 
     private int cursorPosition;
     private boolean deltaEmpty = true;
 
-
     /**
      * @param stream raw client request
-     * @return parsed client message for further processing
-     * @throws java.io.IOException if client request is not parable
      */
     public MobWriteRequest(InputStream stream) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
@@ -64,11 +64,78 @@ public class MobWriteRequest extends MobWriteMessage {
         this.deltaEmpty = deltaEmpty;
     }
 
-    public boolean isDeltaEmpty(){
+    public boolean isDeltaEmpty() {
         return deltaEmpty;
     }
 
     public int getCursorPosition() {
         return cursorPosition;
+    }
+
+    private static interface LineHandler {
+
+        boolean canHandle(String line);
+
+        void handle(String line);
+    }
+
+    private static class TokenLineHandler implements LineHandler{
+        @Override
+        public boolean canHandle(String line) {
+            return false;
+        }
+
+        @Override
+        public void handle(String line) {
+
+        }
+    }
+
+    private static class DocumentLineHandler implements LineHandler{
+        @Override
+        public boolean canHandle(String line) {
+            return false;
+        }
+
+        @Override
+        public void handle(String line) {
+
+        }
+    }
+
+    private static class DiffLineHandler implements LineHandler {
+        @Override
+        public boolean canHandle(String line) {
+            return false;
+        }
+
+        @Override
+        public void handle(String line) {
+
+        }
+    }
+
+    private static class RawLineHandler implements LineHandler {
+        @Override
+        public boolean canHandle(String line) {
+            return false;
+        }
+
+        @Override
+        public void handle(String line) {
+
+        }
+    }
+
+    private static class CursorLineHandler implements LineHandler{
+        @Override
+        public boolean canHandle(String line) {
+            return false;
+        }
+
+        @Override
+        public void handle(String line) {
+
+        }
     }
 }

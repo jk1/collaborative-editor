@@ -129,6 +129,7 @@ public class View {
                 }
             }
         } catch (IllegalArgumentException e) {
+            e.printStackTrace();
             deltaOk = false;
             LOGGER.warning("Delta application failure: " + e.getMessage());
         }

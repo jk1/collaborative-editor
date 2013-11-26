@@ -56,7 +56,7 @@ public class Document {
     }
 
     /**
-     * @return list of users currently wirking with this document
+     * @return list of users currently working with this document
      */
     public Collection<String> getEditors() {
         return new HashSet<>(views.keySet()); // defensive copy

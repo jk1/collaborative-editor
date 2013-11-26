@@ -5,9 +5,18 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Represents MobWrite server response, generated as an answer to
+ * client diff request. It serves two main purposes: acknowledge
+ * client changes reception and postback of all the diffs server
+ * have for ths particular client.
+ *
  * @author Evgeny Naumenko
+ * @see <a href="https://code.google.com/p/google-mobwrite/wiki/Protocol">MobWrite protocol reference</a>
  */
 public class MobWriteResponse extends MobWriteMessage {
+
+    private static final String RESPONSE_HEADER = "f:%d:%s\n";
+    private static final String CURSOR_LINE = "c:%d\n";
 
     private List<Integer> responseCursors = new ArrayList<>();
 
@@ -30,13 +39,13 @@ public class MobWriteResponse extends MobWriteMessage {
      */
     public String asString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("f:").append(version).append(':').append(documentName).append('\n');
+        builder.append(String.format(RESPONSE_HEADER, version, documentName));
         for (Diff element : diffs) {
             builder.append(element);
         }
         Collections.sort(responseCursors);
         for (Integer cursor : responseCursors) {
-            builder.append("c:").append(cursor).append("\n");
+            builder.append(String.format(CURSOR_LINE, cursor));
         }
         return builder.append('\n').toString();
     }
