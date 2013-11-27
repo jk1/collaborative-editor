@@ -69,7 +69,7 @@ mobwrite.shareDiv.prototype.setClientText = function (text) {
     }
 }(jQuery));
 
-mobwrite.shareDiv.prototype.isOrContains = function(node, container) {
+mobwrite.shareDiv.prototype.isOrContains = function (node, container) {
     while (node) {
         if (node === container) {
             return true;
@@ -79,7 +79,7 @@ mobwrite.shareDiv.prototype.isOrContains = function(node, container) {
     return false;
 };
 
-mobwrite.shareDiv.prototype.elementContainsSelection = function(el) {
+mobwrite.shareDiv.prototype.elementContainsSelection = function (el) {
     var sel;
     if (window.getSelection) {
         sel = window.getSelection();
@@ -97,7 +97,7 @@ mobwrite.shareDiv.prototype.elementContainsSelection = function(el) {
     return false;
 };
 
-mobwrite.shareDiv.prototype.previousNode = function(baseNode) {
+mobwrite.shareDiv.prototype.previousNode = function (baseNode) {
     if (baseNode.previousSibling) {
         return baseNode.previousSibling;
     } else {
@@ -128,10 +128,6 @@ mobwrite.shareDiv.prototype.getCursorOffset = function () {
     } else {
         return 0;
     }
-};
-
-mobwrite.shareDiv.prototype.setCursorOffset = function (offset) {
-
 };
 
 /**
@@ -405,57 +401,7 @@ mobwrite.shareDiv.prototype.captureCursor_ = function () {
         cursor.startPrefix = text.substring(selectionStart - padLength, selectionStart);
         cursor.startSuffix = text.substring(selectionStart, selectionStart + padLength);
         cursor.startOffset = selectionStart;
-        cursor.collapsed = (selectionStart == selectionEnd);
-        if (!cursor.collapsed) {
-            cursor.endPrefix = text.substring(selectionEnd - padLength, selectionEnd);
-            cursor.endSuffix = text.substring(selectionEnd, selectionEnd + padLength);
-            cursor.endOffset = selectionEnd;
-        }
-    } else {  // IE
-        // Walk up the tree looking for this textarea's document node.
-        var doc = this.element;
-        while (doc.parentNode) {
-            doc = doc.parentNode;
-        }
-        if (!doc.selection || !doc.selection.createRange) {
-            // Not IE?
-            return null;
-        }
-        var range = doc.selection.createRange();
-        if (range.parentElement() != this.element) {
-            // Cursor not in this textarea.
-            return null;
-        }
-        var newRange = doc.body.createTextRange();
-
-        cursor.collapsed = (range.text == '');
-        newRange.moveToElementText(this.element);
-        if (!cursor.collapsed) {
-            newRange.setEndPoint('EndToEnd', range);
-            cursor.endPrefix = newRange.text;
-            cursor.endOffset = cursor.endPrefix.length;
-            cursor.endPrefix = cursor.endPrefix.substring(cursor.endPrefix.length - padLength);
-        }
-        newRange.setEndPoint('EndToStart', range);
-        cursor.startPrefix = newRange.text;
-        cursor.startOffset = cursor.startPrefix.length;
-        cursor.startPrefix = cursor.startPrefix.substring(cursor.startPrefix.length - padLength);
-
-        newRange.moveToElementText(this.element);
-        newRange.setEndPoint('StartToStart', range);
-        cursor.startSuffix = newRange.text.substring(0, padLength);
-        if (!cursor.collapsed) {
-            newRange.setEndPoint('StartToEnd', range);
-            cursor.endSuffix = newRange.text.substring(0, padLength);
-        }
     }
-
-    // Record scrollbar locations
-    if ('scrollTop' in this.element) {
-        cursor.scrollTop = this.element.scrollTop / this.element.scrollHeight;
-        cursor.scrollLeft = this.element.scrollLeft / this.element.scrollWidth;
-    }
-
     return cursor;
 };
 
@@ -466,6 +412,9 @@ mobwrite.shareDiv.prototype.captureCursor_ = function () {
  * @private
  */
 mobwrite.shareDiv.prototype.restoreCursor_ = function (cursor) {
+    if (!cursor || !cursor.startOffset){
+        return; // no cursor has been captured
+    }
     // Set some constants which tweak the matching behaviour.
     // Maximum distance to search from expected location.
     this.dmp.Match_Distance = 1000;
@@ -489,75 +438,39 @@ mobwrite.shareDiv.prototype.restoreCursor_ = function (cursor) {
         cursorStartPoint += this.dmp.diff_xIndex(diff, cursor.startPrefix.length);
     }
 
-    var cursorEndPoint = null;
-    if (!cursor.collapsed) {
-        // Find the end of the selection in the new text.
-        pattern1 = cursor.endPrefix + cursor.endSuffix;
-        cursorEndPoint = this.dmp.match_main(newText, pattern1,
-            cursor.endOffset - padLength);
-        if (cursorEndPoint !== null) {
-            pattern2 = newText.substring(cursorEndPoint,
-                cursorEndPoint + pattern1.length);
-            //alert(pattern1 + '\nvs\n' + pattern2);
-            // Run a diff to get a framework of equivalent indicies.
-            diff = this.dmp.diff_main(pattern1, pattern2, false);
-            cursorEndPoint += this.dmp.diff_xIndex(diff, cursor.endPrefix.length);
-        }
-    }
-
-    // Deal with loose ends
-    if (cursorStartPoint === null && cursorEndPoint !== null) {
-        // Lost the start point of the selection, but we have the end point.
-        // Collapse to end point.
-        cursorStartPoint = cursorEndPoint;
-    } else if (cursorStartPoint === null && cursorEndPoint === null) {
-        // Lost both start and end points.
+    if (cursorStartPoint === null) {
         // Jump to the offset of start.
         cursorStartPoint = cursor.startOffset;
     }
-    if (cursorEndPoint === null) {
-        // End not known, collapse to start.
-        cursorEndPoint = cursorStartPoint;
-    }
 
     // Restore selection.
+    var range = document.createRange();
+    var sel = window.getSelection();
+
     if (this.elementContainsSelection(this.element)) {  // W3
-        var range = document.createRange();
-        var sel = window.getSelection();
-        range.setStart(this.element.childNodes[0], 5);
+        var children = this.element.childNodes;
+        for (var i = 0; i < children.length; i++) {
+            var baseNode = children[i];
+            if (baseNode.tagName == 'DIV'){
+                baseNode = baseNode.childNodes[0];
+            }
+            if (baseNode.data){ // text node
+               if (cursorStartPoint - baseNode.data.length < 0){
+                   range.setStart(baseNode, cursorStartPoint);
+               } else {
+                   cursorStartPoint -= baseNode.data.length;
+               }
+            } else { // must be a <br>
+                if (cursorStartPoint == 0){
+                    range.setStart(baseNode, 0);
+                } else {
+                    cursorStartPoint--;
+                }
+            }
+        }
         range.collapse(true);
         sel.removeAllRanges();
         sel.addRange(range);
-    } else {  // IE
-        // Walk up the tree looking for this divs's document node.
-        var doc = this.element;
-        while (doc.parentNode) {
-            doc = doc.parentNode;
-        }
-        if (!doc.selection || !doc.selection.createRange) {
-            // Not IE?
-            return;
-        }
-        // IE's TextRange.move functions treat '\r\n' as one character.
-        var snippet = this.element.innerText.substring(0, cursorStartPoint);
-        var ieStartPoint = snippet.replace(/\r\n/g, '\n').length;
-
-        var newRange = doc.body.createTextRange();
-        newRange.moveToElementText(this.element);
-        newRange.collapse(true);
-        newRange.moveStart('character', ieStartPoint);
-        if (!cursor.collapsed) {
-            snippet = this.element.innerText.substring(cursorStartPoint, cursorEndPoint);
-            var ieMidLength = snippet.replace(/\r\n/g, '\n').length;
-            newRange.moveEnd('character', ieMidLength);
-        }
-        newRange.select();
-    }
-
-    // Restore scrollbar locations
-    if ('scrollTop' in cursor) {
-        this.element.scrollTop = cursor.scrollTop * this.element.scrollHeight;
-        this.element.scrollLeft = cursor.scrollLeft * this.element.scrollWidth;
     }
 };
 
