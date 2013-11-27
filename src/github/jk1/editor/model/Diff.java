@@ -11,10 +11,6 @@ public class Diff {
     private Mode mode;
     private String payload;
 
-    public Diff(char mode, int version, String payload) {
-        this(('d' == mode ? Mode.DELTA : Mode.RAW), version, payload);
-    }
-
     public Diff(Mode mode, int version, String payload) {
         this.version = version;
         this.mode = mode;
