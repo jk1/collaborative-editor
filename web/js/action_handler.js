@@ -14,7 +14,8 @@ $(document).ready(function () {
     //load all known document names from server
     action_handler.refreshDocumentList();
     //bind event handlers
-    $('#createDocument').on('click', createDocumentOnClick);
+    $('#createDocument').on('click', createDocument);
+    $('#nameInput').on('keyup', createDocumentOnEnter);
     $('.document-area').on("DOMSubtreeModified", action_handler.editor_resize);
 });
 
@@ -66,11 +67,14 @@ function documentListOnClick(e) {
     mobwrite.share(editor[0]);
 }
 
+function createDocumentOnEnter(e){
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code == 13) { //Enter keycode
+        createDocument(e);
+    }
+}
 
-/**
- * Handle new document creation
- */
-function createDocumentOnClick(e) {
+function createDocument(e) {
     input = $('#nameInput');
     transport.createDocument(input.val(), function (header) {
         addDocumentToPage(header.id, header.name);
